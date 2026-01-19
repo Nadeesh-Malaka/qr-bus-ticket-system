@@ -18,7 +18,7 @@ if ($conn->connect_error) {
 $data = json_decode(file_get_contents("php://input"), true);
 
 if (!$data) {
-    echo json_encode(["status" => false, "message" => "No data received"]);
+    echo json_encode(["status" => false, "message" => "No data received. Please check your form."]);
     exit;
 }
 
@@ -31,9 +31,30 @@ $addr1    = trim($data['address1'] ?? '');
 $addr2    = trim($data['address2'] ?? '');
 $city     = trim($data['city'] ?? '');
 $mobile   = trim($data['mobile'] ?? '');
-$usertype = trim($data['usertype'] ?? '');
 $gmail    = trim($data['gmail'] ?? '');
 $password = trim($data['password'] ?? '');
+
+/* Validate required fields */
+if (empty($fullname) || empty($gmail) || empty($password)) {
+    echo json_encode(["status" => false, "message" => "Full name, email, and password are required"]);
+    exit;
+}
+
+/* Check if email already exists */
+$check_email = $conn->prepare("SELECT id FROM users WHERE gmail = ?");
+$check_email->bind_param("s", $gmail);
+$check_email->execute();
+if ($check_email->get_result()->num_rows > 0) {
+    echo json_encode(["status" => false, "message" => "Email already registered"]);
+    exit;
+}
+$check_email->close();
+
+/* Default all new registrations to 'passenger' role */
+$usertype = 'passenger';
+
+/* Hash password for security */
+$hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
 /* User type → prefix map */
 $prefixMap = [
@@ -42,14 +63,6 @@ $prefixMap = [
     'bus driver'   => 'DRV',
     'passenger'    => 'PAS'
 ];
-
-if (!isset($prefixMap[$usertype])) {
-    echo json_encode([
-        "status" => false,
-        "message" => "Invalid user type"
-    ]);
-    exit;
-}
 
 /* Start transaction */
 $conn->begin_transaction();
@@ -66,7 +79,7 @@ try {
     $stmt->bind_param(
         "sssssssssss",
         $fullname, $gender, $dob, $nic,
-        $addr1, $addr2, $city, $mobile, $usertype, $gmail, $password
+        $addr1, $addr2, $city, $mobile, $usertype, $gmail, $hashed_password
     );
 
     if (!$stmt->execute()) {

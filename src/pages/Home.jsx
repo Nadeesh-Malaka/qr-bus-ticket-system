@@ -62,27 +62,6 @@ export default function Home() {
   return (
     <div className="site-wrap" id="home-section">
 
-       {/* Header */}
-      <header className="site-navbar site-navbar-target" role="banner">
-        <div className="container">
-          <div className="row align-items-center position-relative">
-            <div className="col-3">
-              <div className="site-logo">
-                <a href="#">ExpressBook</a>
-              </div>
-            </div>
-            <div className="col-9 text-right">
-              <span className="d-inline-block d-lg-none">
-                <a href="#" className="site-menu-toggle js-menu-toggle py-5 text-white">
-                  <span className="icon-menu h3 text-white" />
-                </a>
-              </span>
-             
-            </div>
-          </div>
-        </div>
-      </header>
-
       {/* Home Section */}
  <section id="home">
   <div className="site-mobile-menu site-navbar-target">
@@ -100,122 +79,22 @@ export default function Home() {
       style={{ backgroundImage: "url('/images/main_img.jpg')" }}
     >
       <div className="container">
-        <div className="col-lg-5">
-          <div className="feature-car-rent-box-1">
-            <div className="main-center">
-              <div className="form-container">
-                <form
-                  onSubmit={async (e) => {
-                    e.preventDefault();
-
-                    const email = e.target.email.value;
-                    const password = e.target.password.value;
-
-                    const formData = new FormData();
-                    formData.append("email", email);
-                    formData.append("password", password);
-
-                    try {
-                      const res = await fetch(
-                        "http://localhost/qrsys/api/login.php",
-                        {
-                          method: "POST",
-                          body: formData,
-                        }
-                      );
-
-                      const data = await res.json();
-
-                      if (data.status) {
-                        // Save user info in localStorage
-                        localStorage.setItem("user", JSON.stringify(data));
-
-                        // Role-based redirect
-                        if (data.role === "passenger") {
-                          window.location.href = "/user-dashboard";
-                        } else if (
-                          data.role === "admin" ||
-                          data.role === "bus operator" ||
-                          data.role === "bus driver"
-                        ) {
-                          window.location.href = "/admin-dashboard";
-                        } else {
-                          alert("Unknown role");
-                        }
-                      } else {
-                        alert(data.message || "Login failed");
-                      }
-                    } catch (err) {
-                      console.error(err);
-                      alert("Server error");
-                    }
-                  }}
-                >
-                  <div style={{ marginBottom: "1rem" }}>
-                    <h2 className="form-title">User Login</h2>
-                  </div>
-
-                  <label htmlFor="email" className="form-label">
-                    Email*
-                  </label>
-                  <input
-                    type="email"
-                    name="email"
-                    id="email"
-                    className="form-input"
-                    placeholder="Enter Your Email"
-                    required
-                  />
-
-                  <label htmlFor="password" className="form-label">
-                    Password*
-                  </label>
-                  <input
-                    type="password"
-                    name="password"
-                    id="password"
-                    className="form-input"
-                    placeholder="Enter your password"
-                    required
-                  />
-
-                  <button className="form-btn" type="submit">
-                    Sign In
-                  </button>
-
-                  <p
-                    className="sign_up"
-                    style={{
-                      color: "black",
-                      display: "block",
-                      marginTop: "20px",
-                      fontSize: "16px",
-                    }}
-                  >
-                    Don't have an account?{" "}
-                    <Link
-                      to="/signup"
-                      style={{ color: "blue", textDecoration: "none" }}
-                    >
-                      Sign up
-                    </Link>
-                  </p>
-
-                  <a
-                    href="#"
-                    style={{
-                      color: "blue",
-                      display: "block",
-                      marginTop: "0.5rem",
-                    }}
-                  >
-                    Forgot Password?
-                  </a>
-                </form>
-              </div>
+        <div className="row align-items-center justify-content-center text-center" style={{ minHeight: '60vh' }}>
+          <div className="col-lg-8">
+            <h1 className="mb-4" style={{ fontSize: '3.5rem', fontWeight: 'bold', color: 'white', textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
+              Welcome to ExpressBook
+            </h1>
+            <p className="mb-5" style={{ fontSize: '1.5rem', color: 'white', textShadow: '1px 1px 3px rgba(0,0,0,0.5)' }}>
+              Your trusted online bus booking platform. Fast, simple, and convenient travel at your fingertips.
+            </p>
+            <div className="d-flex justify-content-center gap-3">
+              <a href="#about" className="btn btn-primary btn-lg px-5 py-3" style={{ fontSize: '1.2rem' }}>
+                Learn More
+              </a>
+              <a href="#services" className="btn btn-outline-light btn-lg px-5 py-3" style={{ fontSize: '1.2rem' }}>
+                Our Services
+              </a>
             </div>
-
-            <div className="d-flex align-items-center bg-light p-3"></div>
           </div>
         </div>
       </div>
