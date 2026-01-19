@@ -13,6 +13,10 @@ import BusTracker from "./components/BusTracker";
 import BusSeatLayout from './components/BusSeatLayout';
 import BookingHistory from './components/BookingHistory';
 import AdminDashboardNew from './pages/AdminDashboardNew';
+import AdminDashboardLayout from './pages/AdminDashboardLayout';
+import AdminDashboardMain from './pages/AdminDashboardMain';
+import ManageRoutes from './components/ManageRoutes';
+import ManageBuses from './components/ManageBuses';
 import PassengerDashboard from './pages/PassengerDashboard';
 import BusOperatorDashboard from './pages/BusOperatorDashboard';
 import BusDriverDashboard from './pages/BusDriverDashboard';
@@ -52,7 +56,7 @@ function NavBar() {
       if (user.role === 'passenger') {
         navigate('/passenger/dashboard');
       } else if (user.role === 'admin') {
-        navigate('/admin/dashboard');
+        navigate('/admin');
       } else if (user.role === 'bus operator') {
         navigate('/operator/dashboard');
       } else if (user.role === 'bus driver') {
@@ -190,30 +194,29 @@ function App() {
             </ProtectedRoute>
           } />
 
-          {/* Admin Routes */}
+          {/* Admin Routes with New Layout */}
+          <Route path="/admin" element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <AdminDashboardLayout />
+            </ProtectedRoute>
+          }>
+            <Route index element={<AdminDashboardMain />} />
+            <Route path="routes" element={<ManageRoutes />} />
+            <Route path="buses" element={<ManageBuses />} />
+            <Route path="users" element={<UserTable />} />
+            <Route path="reports" element={<CustomerFeedback />} />
+            <Route path="feedback" element={<CustomerFeedback />} />
+          </Route>
+
+          {/* Legacy Admin Routes for backward compatibility */}
           <Route path="/admin/dashboard" element={
             <ProtectedRoute allowedRoles={['admin']}>
               <AdminDashboardNew />
             </ProtectedRoute>
           } />
-          <Route path="/admin/users" element={
-            <ProtectedRoute allowedRoles={['admin']}>
-              <UserTable />
-            </ProtectedRoute>
-          } />
-          <Route path="/admin/routes" element={
-            <ProtectedRoute allowedRoles={['admin']}>
-              <RouteTable />
-            </ProtectedRoute>
-          } />
           <Route path="/admin/add-route" element={
             <ProtectedRoute allowedRoles={['admin']}>
               <RouteData />
-            </ProtectedRoute>
-          } />
-          <Route path="/admin/buses" element={
-            <ProtectedRoute allowedRoles={['admin']}>
-              <BusTable />
             </ProtectedRoute>
           } />
           <Route path="/admin/add-bus" element={
@@ -229,11 +232,6 @@ function App() {
           <Route path="/admin/bookings" element={
             <ProtectedRoute allowedRoles={['admin']}>
               <BookingHistory />
-            </ProtectedRoute>
-          } />
-          <Route path="/admin/reports" element={
-            <ProtectedRoute allowedRoles={['admin']}>
-              <CustomerFeedback />
             </ProtectedRoute>
           } />
 

@@ -45,15 +45,21 @@ if ($method === 'POST') {
     
     if ($data['action'] === 'create') {
         $stmt = $conn->prepare(
-            "INSERT INTO bus (bus_no, bus_type, capacity, operator_id) VALUES (?, ?, ?, ?)"
+            "INSERT INTO bus (bus_no, bus_route, no_of_seats, bus_service_tel, start_time, reach_time, seat_rows, seat_columns, aisle_after_column) 
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
         );
         
         $stmt->bind_param(
-            "ssis",
+            "ssisssiii",
             $data['bus_no'],
-            $data['bus_type'],
-            $data['capacity'],
-            $data['operator_id']
+            $data['bus_route'],
+            $data['no_of_seats'],
+            $data['bus_service_tel'],
+            $data['start_time'],
+            $data['reach_time'],
+            $data['seat_rows'],
+            $data['seat_columns'],
+            $data['aisle_after_column']
         );
         
         if ($stmt->execute()) {
@@ -73,25 +79,23 @@ if ($method === 'POST') {
     exit;
 }
 
-/* PUT - Update bus */
-if ($method === 'PUT') {
-    $data = json_decode(file_get_contents("php://input"), true);
-    
-    if (!$data || !isset($data['action']) || $data['action'] !== 'update') {
-        echo json_encode(["status" => false, "message" => "Invalid request"]);
-        exit;
-    }
-    
+/* Handle UPDATE via POST */
+if ($method === 'POST' && isset($data['action']) && $data['action'] === 'update') {
     $stmt = $conn->prepare(
-        "UPDATE bus SET bus_no=?, bus_type=?, capacity=?, operator_id=? WHERE bus_id=?"
+        "UPDATE bus SET bus_no=?, bus_route=?, no_of_seats=?, bus_service_tel=?, start_time=?, reach_time=?, seat_rows=?, seat_columns=?, aisle_after_column=? WHERE bus_id=?"
     );
     
     $stmt->bind_param(
-        "ssisi",
+        "ssisssiiii",
         $data['bus_no'],
-        $data['bus_type'],
-        $data['capacity'],
-        $data['operator_id'],
+        $data['bus_route'],
+        $data['no_of_seats'],
+        $data['bus_service_tel'],
+        $data['start_time'],
+        $data['reach_time'],
+        $data['seat_rows'],
+        $data['seat_columns'],
+        $data['aisle_after_column'],
         $data['bus_id']
     );
     
@@ -110,15 +114,8 @@ if ($method === 'PUT') {
     exit;
 }
 
-/* DELETE - Delete bus */
-if ($method === 'DELETE') {
-    $data = json_decode(file_get_contents("php://input"), true);
-    
-    if (!$data || !isset($data['action']) || $data['action'] !== 'delete') {
-        echo json_encode(["status" => false, "message" => "Invalid request"]);
-        exit;
-    }
-    
+/* Handle DELETE via POST */
+if ($method === 'POST' && isset($data['action']) && $data['action'] === 'delete') {
     $stmt = $conn->prepare("DELETE FROM bus WHERE bus_id=?");
     $stmt->bind_param("i", $data['bus_id']);
     
