@@ -29,13 +29,14 @@ file_put_contents("debug.log", $raw . PHP_EOL, FILE_APPEND);
 /* ---------- CREATE ---------- */
 if ($action === "create") {
     $stmt = $conn->prepare(
-        "INSERT INTO route (route_name, city, province, postal_code)
-         VALUES (?, ?, ?, ?)"
+        "INSERT INTO route (route_name, start_city, end_city, province, postal_code)
+         VALUES (?, ?, ?, ?, ?)"
     );
     $stmt->bind_param(
-        "sssi",
+        "ssssi",
         $data['route_name'],
-        $data['city'],
+        $data['start_city'],
+        $data['end_city'],
         $data['province'],
         $data['postal_code']
     );
@@ -48,14 +49,15 @@ if ($action === "create") {
 if ($action === "update") {
     $stmt = $conn->prepare(
         "UPDATE route
-         SET route_name=?, city=?, province=?, postal_code=?
+         SET route_name=?, start_city=?, end_city=?, province=?, postal_code=?
          WHERE route_id=?"
     );
 
     $stmt->bind_param(
-        "sssii",   // ← FIXED
+        "ssssii",
         $data['route_name'],
-        $data['city'],
+        $data['start_city'],
+        $data['end_city'],
         $data['province'],
         $data['postal_code'],
         $data['route_id']
@@ -82,7 +84,7 @@ if ($action === "delete") {
 
 /* ---------- READ ---------- */
 $result = $conn->query(
-    "SELECT route_id, route_name, city, province, postal_code FROM route"
+    "SELECT route_id, route_name, start_city, end_city, province, postal_code FROM route"
 );
 
 $routes = [];

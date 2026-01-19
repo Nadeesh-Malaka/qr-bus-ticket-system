@@ -40,7 +40,7 @@ export default function AdminDashboardLayout() {
         <div className="sidebar-header">
           <div className="sidebar-logo">
             <FiTruck size={28} />
-            <span>BusBook</span>
+            <span>ExpressBook</span>
           </div>
           <div className="sidebar-subtitle">Admin Panel</div>
         </div>

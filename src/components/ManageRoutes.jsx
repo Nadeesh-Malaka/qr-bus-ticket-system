@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FiPlus, FiEdit2, FiTrash2, FiSearch, FiMap } from 'react-icons/fi';
+import { FiPlus, FiEdit2, FiTrash2, FiSearch, FiMap, FiMapPin } from 'react-icons/fi';
 import '../pages/AdminDashboard.css';
 
 export default function ManageRoutes() {
@@ -12,7 +12,8 @@ export default function ManageRoutes() {
 
   const [formData, setFormData] = useState({
     route_name: '',
-    city: '',
+    start_city: '',
+    end_city: '',
     province: '',
     postal_code: ''
   });
@@ -74,7 +75,8 @@ export default function ManageRoutes() {
     setEditingRoute(route);
     setFormData({
       route_name: route.route_name,
-      city: route.city,
+      start_city: route.start_city,
+      end_city: route.end_city,
       province: route.province,
       postal_code: route.postal_code
     });
@@ -112,7 +114,8 @@ export default function ManageRoutes() {
     setEditingRoute(null);
     setFormData({
       route_name: '',
-      city: '',
+      start_city: '',
+      end_city: '',
       province: '',
       postal_code: ''
     });
@@ -124,7 +127,8 @@ export default function ManageRoutes() {
     setEditingRoute(null);
     setFormData({
       route_name: '',
-      city: '',
+      start_city: '',
+      end_city: '',
       province: '',
       postal_code: ''
     });
@@ -132,21 +136,10 @@ export default function ManageRoutes() {
 
   const filteredRoutes = routes.filter(route =>
     route.route_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    route.city?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    route.start_city?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    route.end_city?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     route.province?.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
-  // Parse route name to get start and end cities
-  const parseRouteName = (routeName) => {
-    if (!routeName) return { start: '', end: '' };
-    const parts = routeName.split('_');
-    if (parts.length < 2) return { start: '', end: routeName };
-    const cities = parts[1].split('-');
-    return { 
-      start: cities[0]?.trim() || '', 
-      end: cities[1]?.trim() || '' 
-    };
-  };
 
   return (
     <div className="dashboard-content">
@@ -181,7 +174,7 @@ export default function ManageRoutes() {
           <input
             type="text"
             className="form-input"
-            placeholder="Search routes..."
+            placeholder="Search by route name, cities, or province..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             style={{ paddingLeft: '40px' }}
@@ -205,7 +198,7 @@ export default function ManageRoutes() {
           <table className="data-table">
             <thead>
               <tr>
-                <th>Route ID</th>
+                <th>Route Name</th>
                 <th>Start City</th>
                 <th>End City</th>
                 <th>Province</th>
@@ -214,36 +207,43 @@ export default function ManageRoutes() {
               </tr>
             </thead>
             <tbody>
-              {filteredRoutes.map((route) => {
-                const { start, end } = parseRouteName(route.route_name);
-                return (
-                  <tr key={route.route_id}>
-                    <td>{route.route_name?.split('_')[0] || '-'}</td>
-                    <td>{start || route.city}</td>
-                    <td>{end || '-'}</td>
-                    <td>{route.province}</td>
-                    <td>{route.postal_code}</td>
-                    <td>
-                      <div className="table-actions">
-                        <button 
-                          className="btn-edit"
-                          onClick={() => handleEdit(route)}
-                        >
-                          <FiEdit2 size={14} />
-                          <span>Edit</span>
-                        </button>
-                        <button 
-                          className="btn-delete"
-                          onClick={() => handleDelete(route.route_id)}
-                        >
-                          <FiTrash2 size={14} />
-                          <span>Delete</span>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
+              {filteredRoutes.map((route) => (
+                <tr key={route.route_id}>
+                  <td><strong>{route.route_name}</strong></td>
+                  <td>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <FiMapPin size={14} style={{ color: '#10b981' }} />
+                      {route.start_city}
+                    </div>
+                  </td>
+                  <td>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <FiMapPin size={14} style={{ color: '#ef4444' }} />
+                      {route.end_city}
+                    </div>
+                  </td>
+                  <td>{route.province}</td>
+                  <td>{route.postal_code}</td>
+                  <td>
+                    <div className="table-actions">
+                      <button 
+                        className="btn-edit"
+                        onClick={() => handleEdit(route)}
+                      >
+                        <FiEdit2 size={14} />
+                        <span>Edit</span>
+                      </button>
+                      <button 
+                        className="btn-delete"
+                        onClick={() => handleDelete(route.route_id)}
+                      >
+                        <FiTrash2 size={14} />
+                        <span>Delete</span>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         )}
@@ -260,65 +260,159 @@ export default function ManageRoutes() {
 
             <form onSubmit={handleSubmit}>
               <div className="modal-body">
-                <div className="form-group">
-                  <label className="form-label required">Route Name</label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    placeholder="e.g., 100-Panadura"
-                    value={formData.route_name}
-                    onChange={(e) => setFormData({...formData, route_name: e.target.value})}
-                    required
-                  />
-                  <small style={{ color: '#64748b', fontSize: '12px', marginTop: '4px', display: 'block' }}>
-                    Format: Route Number_Start City - End City
-                  </small>
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label required">City / Stops</label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    placeholder="e.g., Pettah - Panadura"
-                    value={formData.city}
-                    onChange={(e) => setFormData({...formData, city: e.target.value})}
-                    required
-                  />
-                </div>
-
-                <div className="form-row">
-                  <div className="form-group">
-                    <label className="form-label required">Province</label>
-                    <select
-                      className="form-select"
-                      value={formData.province}
-                      onChange={(e) => setFormData({...formData, province: e.target.value})}
-                      required
-                    >
-                      <option value="">Select Province</option>
-                      <option value="Western">Western</option>
-                      <option value="Central">Central</option>
-                      <option value="Southern">Southern</option>
-                      <option value="Northern">Northern</option>
-                      <option value="Eastern">Eastern</option>
-                      <option value="North Western">North Western</option>
-                      <option value="North Central">North Central</option>
-                      <option value="Uva">Uva</option>
-                      <option value="Sabaragamuwa">Sabaragamuwa</option>
-                    </select>
-                  </div>
+                {/* Route Identification */}
+                <div style={{
+                  background: '#f8fafc',
+                  padding: '20px',
+                  borderRadius: '8px',
+                  marginBottom: '24px'
+                }}>
+                  <h3 style={{
+                    fontSize: '15px',
+                    fontWeight: 600,
+                    color: '#1e293b',
+                    marginBottom: '16px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}>
+                    <FiMap size={16} />
+                    Route Identification
+                  </h3>
 
                   <div className="form-group">
-                    <label className="form-label required">Postal Code</label>
+                    <label className="form-label required">Route Name / Number</label>
                     <input
                       type="text"
                       className="form-input"
-                      placeholder="e.g., 12500"
-                      value={formData.postal_code}
-                      onChange={(e) => setFormData({...formData, postal_code: e.target.value})}
+                      placeholder="e.g., 100-Colombo-Panadura"
+                      value={formData.route_name}
+                      onChange={(e) => setFormData({...formData, route_name: e.target.value})}
                       required
                     />
+                    <small style={{ color: '#64748b', fontSize: '12px', marginTop: '4px', display: 'block' }}>
+                      Enter a unique route identifier
+                    </small>
+                  </div>
+                </div>
+
+                {/* Travel Endpoints */}
+                <div style={{
+                  background: '#f0fdf4',
+                  padding: '20px',
+                  borderRadius: '8px',
+                  marginBottom: '24px',
+                  border: '1px solid #bbf7d0'
+                }}>
+                  <h3 style={{
+                    fontSize: '15px',
+                    fontWeight: 600,
+                    color: '#166534',
+                    marginBottom: '16px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}>
+                    <FiMapPin size={16} />
+                    Travel Endpoints
+                  </h3>
+
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label className="form-label required">
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <FiMapPin size={14} style={{ color: '#10b981' }} />
+                          Start City
+                        </span>
+                      </label>
+                      <input
+                        type="text"
+                        className="form-input"
+                        placeholder="e.g., Colombo"
+                        value={formData.start_city}
+                        onChange={(e) => setFormData({...formData, start_city: e.target.value})}
+                        required
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label required">
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <FiMapPin size={14} style={{ color: '#ef4444' }} />
+                          End City
+                        </span>
+                      </label>
+                      <input
+                        type="text"
+                        className="form-input"
+                        placeholder="e.g., Panadura"
+                        value={formData.end_city}
+                        onChange={(e) => setFormData({...formData, end_city: e.target.value})}
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{
+                    background: 'white',
+                    padding: '12px',
+                    borderRadius: '6px',
+                    marginTop: '12px',
+                    fontSize: '13px',
+                    color: '#475569'
+                  }}>
+                    <strong>Note:</strong> Passengers will search by Start City → End City. Ensure these are correct.
+                  </div>
+                </div>
+
+                {/* Location Details */}
+                <div style={{
+                  background: '#f8fafc',
+                  padding: '20px',
+                  borderRadius: '8px'
+                }}>
+                  <h3 style={{
+                    fontSize: '15px',
+                    fontWeight: 600,
+                    color: '#1e293b',
+                    marginBottom: '16px'
+                  }}>
+                    Location Details
+                  </h3>
+
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label className="form-label required">Province</label>
+                      <select
+                        className="form-select"
+                        value={formData.province}
+                        onChange={(e) => setFormData({...formData, province: e.target.value})}
+                        required
+                      >
+                        <option value="">Select Province</option>
+                        <option value="Western">Western</option>
+                        <option value="Central">Central</option>
+                        <option value="Southern">Southern</option>
+                        <option value="Northern">Northern</option>
+                        <option value="Eastern">Eastern</option>
+                        <option value="North Western">North Western</option>
+                        <option value="North Central">North Central</option>
+                        <option value="Uva">Uva</option>
+                        <option value="Sabaragamuwa">Sabaragamuwa</option>
+                      </select>
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label required">Postal Code</label>
+                      <input
+                        type="text"
+                        className="form-input"
+                        placeholder="e.g., 12500"
+                        value={formData.postal_code}
+                        onChange={(e) => setFormData({...formData, postal_code: e.target.value})}
+                        required
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
