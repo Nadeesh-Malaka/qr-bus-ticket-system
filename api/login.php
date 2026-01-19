@@ -40,14 +40,38 @@ $stmt->execute();
 $user = $stmt->get_result()->fetch_assoc();
 
 if (!$user) {
-    echo json_encode(["status" => false, "message" => "Invalid credentials"]);
+    error_log("Login failed: User not found for email: " . $email);
+    echo json_encode(["status" => false, "message" => "Invalid credentials", "debug" => "User not found"]);
     exit;
 }
 
-// Check password (use password_verify if hashed)
-if ($user['password'] !== $password) {
-    echo json_encode(["status" => false, "message" => "Invalid credentials"]);
-    exit;
+error_log("Login attempt for: " . $email . " | Password length in DB: " . strlen($user['password']));
+
+// Check password - support both old plain text and new hashed passwords
+// Check if password is hashed (starts with $2y$ for bcrypt)
+if (strpos($user['password'], '$2y$') === 0) {
+    // New hashed password
+    error_log("Checking hashed password for: " . $email);
+    if (!password_verify($password, $user['password'])) {
+        error_log("Login failed: Hashed password mismatch for: " . $email);
+        echo json_encode(["status" => false, "message" => "Invalid credentials", "debug" => "Password mismatch (hashed)"]);
+        exit;
+    }
+    error_log("Login successful (hashed): " . $email);
+} else {
+    // Old plain text password - also hash it for future use
+    error_log("Checking plain text password for: " . $email);
+    if ($user['password'] !== $password) {
+        error_log("Login failed: Plain text password mismatch for: " . $email);
+        echo json_encode(["status" => false, "message" => "Invalid credentials", "debug" => "Password mismatch (plain text)"]);
+        exit;
+    }
+    error_log("Login successful (plain text): " . $email . " - Upgrading to hashed");
+    // Update to hashed password for next time
+    $hashed = password_hash($password, PASSWORD_DEFAULT);
+    $update = $conn->prepare("UPDATE users SET password = ? WHERE id = ?");
+    $update->bind_param("si", $hashed, $user['id']);
+    $update->execute();
 }
 
 // Generate user_id with prefix

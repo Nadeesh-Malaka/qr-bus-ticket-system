@@ -1,7 +1,11 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "../assets/styles.css";
 
 export default function Users() {
+  const navigate = useNavigate();
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const [formData, setFormData] = useState({
     fullname: "",
@@ -12,7 +16,6 @@ export default function Users() {
     address2: "",
     city: "",
     mobile: "",
-    usertype: "",
     gmail: "",
     password: ""
   });
@@ -26,6 +29,7 @@ export default function Users() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMessage(''); // Clear previous errors
 
     try {
       const response = await fetch(
@@ -40,7 +44,10 @@ export default function Users() {
       const result = await response.json();
 
       if (result.status) {
-        alert("User Registered Successfully");
+        // Show success notification
+        setShowSuccess(true);
+        
+        // Clear form
         setFormData({
           fullname: "",
           gender: "",
@@ -50,22 +57,93 @@ export default function Users() {
           address2: "",
           city: "",
           mobile: "",
-          usertype: "",
           gmail: "",
           password: ""
         });
+
+        // Navigate to home after 2 seconds
+        setTimeout(() => {
+          navigate("/home");
+        }, 2000);
       } else {
-        alert(result.message || "Registration Failed");
+        setErrorMessage(result.message || "Registration Failed");
       }
 
     } catch (error) {
-      alert("Server Error");
+      setErrorMessage("Server Error: Unable to connect to server");
       console.error(error);
     }
   };
 
   return (
     <div className="main-center">
+      {/* Success Notification */}
+      {showSuccess && (
+        <div style={{
+          position: 'fixed',
+          top: '20px',
+          right: '20px',
+          backgroundColor: '#28a745',
+          color: 'white',
+          padding: '15px 25px',
+          borderRadius: '8px',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+          zIndex: 9999,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          animation: 'slideIn 0.3s ease-out'
+        }}>
+          <span style={{ fontSize: '24px' }}>✓</span>
+          <div>
+            <strong>Registration Successful!</strong>
+            <p style={{ margin: '5px 0 0 0', fontSize: '14px' }}>
+              Account created as Passenger. Redirecting to login...
+            </p>
+          </div>
+        </div>
+      )}
+{/* Error Notification */}
+      {errorMessage && (
+        <div style={{
+          position: 'fixed',
+          top: '20px',
+          right: '20px',
+          backgroundColor: '#dc3545',
+          color: 'white',
+          padding: '15px 25px',
+          borderRadius: '8px',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+          zIndex: 9999,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          animation: 'slideIn 0.3s ease-out'
+        }}>
+          <span style={{ fontSize: '24px' }}>✕</span>
+          <div>
+            <strong>Registration Failed</strong>
+            <p style={{ margin: '5px 0 0 0', fontSize: '14px' }}>
+              {errorMessage}
+            </p>
+          </div>
+          <button
+            onClick={() => setErrorMessage('')}
+            style={{
+              marginLeft: '10px',
+              background: 'none',
+              border: 'none',
+              color: 'white',
+              fontSize: '20px',
+              cursor: 'pointer'
+            }}
+          >
+            ×
+          </button>
+        </div>
+      )}
+
+      
       <div className="form-container">
         <form onSubmit={handleSubmit}>
 
@@ -152,21 +230,6 @@ export default function Users() {
             onChange={handleChange}
             required
           />
-
-          <label className="form-label">User Role*</label>
-          <select
-            name="usertype"
-            className="form-select"
-            value={formData.usertype}
-            onChange={handleChange}
-            required
-          >
-            <option value="">Select User Role</option>
-            <option value="admin">Administrator</option>
-            <option value="bus_operator">Bus Operator</option>
-            <option value="bus_driver">Bus Driver</option>
-            <option value="passenger">Passenger</option>
-          </select>
 
           <label className="form-label">Gmail*</label>
           <input

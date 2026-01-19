@@ -1,14 +1,15 @@
 import React, { useState, useEffect, useMemo } from "react";
 import "../assets/styles.css";
 
-const API_URL = "http://localhost/qr_system/api/get_users.php";
+const API_URL = "http://localhost/qrsys/api/get_users.php";
 
-export default function BusSchedule() {
+export default function UserTable() {
   const [users, setUsers] = useState([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [deletingId, setDeletingId] = useState(null);
+  const [editingUser, setEditingUser] = useState(null);
 
   /* 🔵 FETCH USERS */
   useEffect(() => {
@@ -56,6 +57,36 @@ export default function BusSchedule() {
     }
   };
 
+  /* ✏️ UPDATE USER ROLE */
+  const handleRoleUpdate = async (userId, newRole) => {
+    try {
+      const res = await fetch("http://localhost/qrsys/api/update_user_role.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          user_id: userId, 
+          user_type: newRole 
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.status) {
+        setUsers((prev) =>
+          prev.map((u) =>
+            u.user_id === userId ? { ...u, user_type: newRole } : u
+          )
+        );
+        setEditingUser(null);
+        alert("User role updated successfully");
+      } else {
+        alert(data.message || "Update failed");
+      }
+    } catch {
+      alert("Server error");
+    }
+  };
+
   /* 🔍 SEARCH FILTER (Optimized) */
   const filteredUsers = useMemo(() => {
     return users.filter((u) =>
@@ -73,7 +104,10 @@ export default function BusSchedule() {
 
   return (
     <div className="table-container">
-      <h2 className="table-heading">Users</h2>
+      <h2 className="table-heading">Users Management</h2>
+      <p style={{ fontSize: '14px', color: '#666', marginBottom: '20px' }}>
+        Admin can view all users and change user roles
+      </p>
 
       {/* 🔍 Search + Print */}
       <div className="table-actions">
@@ -96,23 +130,19 @@ export default function BusSchedule() {
             <th>User ID</th>
             <th>Full Name</th>
             <th>Gender</th>
-            <th>DOB</th>
             <th>NIC</th>
-            <th>Address 1</th>
-            <th>Address 2</th>
             <th>City</th>
             <th>Mobile</th>
             <th>User Type</th>
-            <th>Created</th>
             <th>Gmail</th>
-            <th>Action</th>
+            <th>Actions</th>
           </tr>
         </thead>
 
         <tbody>
           {filteredUsers.length === 0 ? (
             <tr>
-              <td colSpan="13">No users found</td>
+              <td colSpan="9">No users found</td>
             </tr>
           ) : (
             filteredUsers.map((u) => (
@@ -120,16 +150,52 @@ export default function BusSchedule() {
                 <td>{u.user_id}</td>
                 <td>{u.full_name}</td>
                 <td>{u.gender}</td>
-                <td>{u.dob}</td>
                 <td>{u.nic}</td>
-                <td>{u.address1}</td>
-                <td>{u.address2}</td>
                 <td>{u.city}</td>
                 <td>{u.mobile_no}</td>
-                <td>{u.user_type}</td>
-                <td>{u.created_at}</td>
+                <td>
+                  {editingUser === u.user_id ? (
+                    <select
+                      defaultValue={u.user_type}
+                      onChange={(e) => handleRoleUpdate(u.user_id, e.target.value)}
+                      style={{
+                        padding: '5px',
+                        borderRadius: '4px',
+                        border: '1px solid #ccc'
+                      }}
+                    >
+                      <option value="passenger">Passenger</option>
+                      <option value="bus driver">Bus Driver</option>
+                      <option value="bus operator">Bus Operator</option>
+                      <option value="admin">Administrator</option>
+                    </select>
+                  ) : (
+                    <span
+                      style={{
+                        padding: '4px 8px',
+                        borderRadius: '4px',
+                        background: 
+                          u.user_type === 'admin' ? '#dc3545' :
+                          u.user_type === 'bus operator' ? '#fd7e14' :
+                          u.user_type === 'bus driver' ? '#0dcaf0' :
+                          '#28a745',
+                        color: 'white',
+                        fontSize: '12px'
+                      }}
+                    >
+                      {u.user_type}
+                    </span>
+                  )}
+                </td>
                 <td>{u.gmail}</td>
                 <td>
+                  <button
+                    className="btn btn-sm btn-warning"
+                    style={{ marginRight: '5px' }}
+                    onClick={() => setEditingUser(u.user_id === editingUser ? null : u.user_id)}
+                  >
+                    {editingUser === u.user_id ? "Cancel" : "Change Role"}
+                  </button>
                   <button
                     className="delete-btn"
                     disabled={deletingId === u.user_id}
