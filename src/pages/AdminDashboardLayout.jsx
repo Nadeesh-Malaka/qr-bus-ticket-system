@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { 
   FiTruck, FiUsers, FiBarChart2, FiMessageSquare,
-  FiLogOut, FiHome, FiMap, FiCalendar
+  FiLogOut, FiHome, FiMap
 } from 'react-icons/fi';
 import './AdminDashboard.css';
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FiPlus, FiEdit2, FiTrash2, FiSearch, FiTruck } from 'react-icons/fi';
+import { FiPlus, FiEdit2, FiTrash2, FiSearch, FiTruck, FiClock, FiGrid } from 'react-icons/fi';
 import '../pages/AdminDashboard.css';
 
 export default function ManageBuses() {
@@ -30,7 +30,7 @@ export default function ManageBuses() {
 
   const fetchBuses = async () => {
     try {
-      const response = await fetch('http://localhost/qrsys/api/get_buses.php');
+      const response = await fetch('http://localhost/qrsys/api/bus_api.php');
       const data = await response.json();
       setBuses(Array.isArray(data) ? data : []);
       setLoading(false);
@@ -280,104 +280,151 @@ export default function ManageBuses() {
 
             <form onSubmit={handleSubmit}>
               <div className="modal-body">
-                {/* Basic Information */}
-                <div className="form-row">
-                  <div className="form-group">
-                    <label className="form-label required">Bus Number</label>
-                    <input
-                      type="text"
-                      className="form-input"
-                      placeholder="e.g., ND-4567"
-                      value={formData.bus_no}
-                      onChange={(e) => setFormData({...formData, bus_no: e.target.value})}
-                      required
-                    />
+                {/* Bus Details Section */}
+                <div style={{
+                  background: '#f8fafc',
+                  padding: '20px',
+                  borderRadius: '8px',
+                  marginBottom: '24px'
+                }}>
+                  <h3 style={{
+                    fontSize: '15px',
+                    fontWeight: 600,
+                    color: '#1e293b',
+                    marginBottom: '16px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}>
+                    <FiTruck size={16} />
+                    Bus Details
+                  </h3>
+
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label className="form-label required">Bus Number</label>
+                      <input
+                        type="text"
+                        className="form-input"
+                        placeholder="e.g., ND-4567"
+                        value={formData.bus_no}
+                        onChange={(e) => setFormData({...formData, bus_no: e.target.value})}
+                        required
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label required">Contact Number</label>
+                      <input
+                        type="tel"
+                        className="form-input"
+                        placeholder="e.g., 0771234567"
+                        value={formData.bus_service_tel}
+                        onChange={(e) => setFormData({...formData, bus_service_tel: e.target.value})}
+                        required
+                      />
+                    </div>
                   </div>
 
-                  <div className="form-group">
-                    <label className="form-label required">Select Route</label>
-                    <select
-                      className="form-select"
-                      value={formData.bus_route}
-                      onChange={(e) => setFormData({...formData, bus_route: e.target.value})}
-                      required
-                    >
-                      <option value="">Select a route</option>
-                      {routes.map((route) => (
-                        <option key={route.route_id} value={route.route_name}>
-                          {route.route_name}
-                        </option>
-                      ))}
-                    </select>
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label className="form-label required">Assigned Route</label>
+                      <select
+                        className="form-select"
+                        value={formData.bus_route}
+                        onChange={(e) => setFormData({...formData, bus_route: e.target.value})}
+                        required
+                      >
+                        <option value="">Select a route</option>
+                        {routes.map((route) => (
+                          <option key={route.route_id} value={route.route_name}>
+                            {route.route_name} ({route.start_city} → {route.end_city})
+                          </option>
+                        ))}
+                      </select>
+                      <small style={{ color: '#64748b', fontSize: '12px', marginTop: '4px', display: 'block' }}>
+                        Bus operates on this route
+                      </small>
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label required">Total Seats</label>
+                      <input
+                        type="number"
+                        className="form-input"
+                        placeholder="e.g., 50"
+                        value={formData.no_of_seats}
+                        onChange={(e) => setFormData({...formData, no_of_seats: e.target.value})}
+                        required
+                        min="1"
+                      />
+                    </div>
                   </div>
                 </div>
 
-                <div className="form-row">
-                  <div className="form-group">
-                    <label className="form-label required">Contact Number</label>
-                    <input
-                      type="tel"
-                      className="form-input"
-                      placeholder="e.g., 0771234567"
-                      value={formData.bus_service_tel}
-                      onChange={(e) => setFormData({...formData, bus_service_tel: e.target.value})}
-                      required
-                    />
-                  </div>
+                {/* Schedule & Timing */}
+                <div style={{
+                  background: '#eff6ff',
+                  padding: '20px',
+                  borderRadius: '8px',
+                  marginBottom: '24px',
+                  border: '1px solid #bfdbfe'
+                }}>
+                  <h3 style={{ 
+                    fontSize: '15px', 
+                    fontWeight: 600, 
+                    color: '#1e40af',
+                    marginBottom: '16px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}>
+                    <FiClock size={16} />
+                    Schedule & Timing
+                  </h3>
 
-                  <div className="form-group">
-                    <label className="form-label required">Total Seats</label>
-                    <input
-                      type="number"
-                      className="form-input"
-                      placeholder="e.g., 50"
-                      value={formData.no_of_seats}
-                      onChange={(e) => setFormData({...formData, no_of_seats: e.target.value})}
-                      required
-                      min="1"
-                    />
-                  </div>
-                </div>
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label className="form-label required">Departure Time</label>
+                      <input
+                        type="time"
+                        className="form-input"
+                        value={formData.start_time}
+                        onChange={(e) => setFormData({...formData, start_time: e.target.value})}
+                        required
+                      />
+                    </div>
 
-                {/* Timing */}
-                <div className="form-row">
-                  <div className="form-group">
-                    <label className="form-label required">Start Time</label>
-                    <input
-                      type="time"
-                      className="form-input"
-                      value={formData.start_time}
-                      onChange={(e) => setFormData({...formData, start_time: e.target.value})}
-                      required
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label required">End Time</label>
-                    <input
-                      type="time"
-                      className="form-input"
-                      value={formData.reach_time}
-                      onChange={(e) => setFormData({...formData, reach_time: e.target.value})}
-                      required
-                    />
+                    <div className="form-group">
+                      <label className="form-label required">Arrival Time</label>
+                      <input
+                        type="time"
+                        className="form-input"
+                        value={formData.reach_time}
+                        onChange={(e) => setFormData({...formData, reach_time: e.target.value})}
+                        required
+                      />
+                    </div>
                   </div>
                 </div>
 
                 {/* Seat Configuration */}
                 <div style={{ 
-                  background: '#f8fafc', 
-                  padding: '16px', 
+                  background: '#fefce8', 
+                  padding: '20px', 
                   borderRadius: '8px',
-                  marginTop: '20px',
-                  marginBottom: '20px'
+                  border: '1px solid #fef08a'
                 }}>
                   <h3 style={{ 
-                    fontSize: '16px', 
+                    fontSize: '15px', 
                     fontWeight: 600, 
-                    color: '#1e293b',
-                    marginBottom: '16px'
+                    color: '#854d0e',
+                    marginBottom: '16px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
                   }}>
+                    <FiGrid size={16} />
                     Seat Configuration
                   </h3>
 
