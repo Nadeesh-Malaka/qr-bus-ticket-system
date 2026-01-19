@@ -21,7 +21,7 @@ import PassengerDashboard from './pages/PassengerDashboard';
 import BusOperatorDashboard from './pages/BusOperatorDashboard';
 import BusDriverDashboard from './pages/BusDriverDashboard';
 import QRScanner from './components/QRScanner';
-import UserTable from './components/UserTable';
+import ManageUsers from './components/ManageUsers';
 import FeedbackForm from './components/FeedbackForm';
 import CustomerFeedback from './components/CustomerFeedback';
 import LoginModal from './components/LoginModal';
@@ -203,7 +203,7 @@ function App() {
             <Route index element={<AdminDashboardMain />} />
             <Route path="routes" element={<ManageRoutes />} />
             <Route path="buses" element={<ManageBuses />} />
-            <Route path="users" element={<UserTable />} />
+            <Route path="users" element={<ManageUsers />} />
             <Route path="reports" element={<CustomerFeedback />} />
             <Route path="feedback" element={<CustomerFeedback />} />
           </Route>
