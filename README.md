@@ -1,70 +1,166 @@
-# Getting Started with Create React App
+# 🚌 QR Based Bus Ticket Reservation System
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+<p align="center">
+  <img src="https://img.shields.io/badge/Status-Prototype-blue" />
+  <img src="https://img.shields.io/badge/Frontend-React.js-61DAFB" />
+  <img src="https://img.shields.io/badge/Backend-PHP-777BB4" />
+  <img src="https://img.shields.io/badge/Database-MySQL-orange" />
+</p>
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## 📌 Project Overview
 
-### `npm start`
+The **QR Based Bus Ticket Reservation System** is a modern, web-based application designed to digitize the traditional bus ticket booking process.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+🎯 **Main Objective**  
+To provide passengers with an easy, fast, and paperless bus ticket reservation experience using **QR code-based E-Tickets**.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+The system mainly focuses on the **Passenger Module**, while also including essential **Admin functionalities** for managing operations.
 
-### `npm test`
+---
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## ✨ Key Features
 
-### `npm run build`
+<details>
+<summary><strong>👤 Passenger Features</strong></summary>
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- 🔐 Secure user registration and login  
+- 🔍 Search buses by **start location, destination, and date**  
+- 🕒 View bus schedules and ticket prices  
+- 💺 Interactive visual seat selection  
+- 📊 Real-time seat availability  
+- 💳 Online payment **simulation** (Credit / Debit card)  
+- 📱 Automatic **QR code generation** as E-Ticket  
+- 📂 Booking history via user dashboard  
+- 💬 Customer feedback submission  
+- 🤖 Rule-based chatbot for FAQs  
+- 🗺️ View bus location on map (basic tracking)
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+</details>
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+<details>
+<summary><strong>🛠️ Admin Features</strong></summary>
 
-### `npm run eject`
+- 🚌 Manage bus routes and schedules  
+- 👥 View registered passenger details  
+- 📑 View all passenger bookings  
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+</details>
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+---
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## 🧰 Technology Stack
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### 🎨 Frontend
+- React.js
+- HTML5
+- CSS3
+- JavaScript
 
-## Learn More
+### ⚙️ Backend
+- PHP (REST-style APIs)
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### 🗄️ Database
+- MySQL
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### 🗺️ Map Integration
+- Leaflet
+- OpenStreetMap
 
-### Code Splitting
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
 
-### Analyzing the Bundle Size
+## 🚀 Installation & Setup
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### ✅ Prerequisites
+- Node.js **v16+**
+- npm
+- XAMPP / WAMP / PHP Server
+- MySQL
+- Git
 
-### Making a Progressive Web App
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+### 🎨 Frontend Setup
 
-### Advanced Configuration
+```bash
+npm install
+npm run dev
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+4. Import the provided **.sql** file into your MySQL database.
 
-### Deployment
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+## 🗄️ Database Design
 
-### `npm run build` fails to minify
+The MySQL database stores the following data:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- 👤 User details  
+- 🚌 Bus routes and schedules  
+- 💺 Seat reservations  
+- 🎟️ Booking records  
+- 💬 Feedback messages  
+
+---
+
+## 💳 Payment Handling
+
+> ⚠️ **Note:**  
+This system uses a **simulated payment interface only**.
+
+- No real payment gateway integration  
+- No real bank transactions  
+
+### Suitable for:
+- Academic projects  
+- Prototypes  
+- Demonstrations  
+
+---
+
+## 📱 QR Code Ticketing
+
+- QR code is generated after a successful booking  
+- Acts as a **digital E-Ticket**  
+
+### QR Code contains:
+- Booking ID  
+- Passenger details  
+- Bus and seat information  
+
+- QR code can be scanned for ticket verification
+
+---
+
+### Deliverables
+- ✅ Complete source code  
+- ✅ Database structure  
+- ✅ Setup documentation  
+
+---
+
+## 🔁 Version Control
+
+- GitHub is used for version control
+
+### Branch Strategy
+- `main` → Stable release  
+- `dev` → Active development  
+
+---
+
+## 👨‍💻 Author
+
+**Nadeesh Malaka**  
+🎓 Undergraduate – ICT  
+💻 Software Development Project  
+
+---
+
+## 📜 License
+
+This project is developed **strictly for educational and demonstration purposes**.
+
+
