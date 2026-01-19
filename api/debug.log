@@ -1,0 +1,9 @@
+
+
+{"action":"update","route_id":"3","route_name":"101-Colombo","city":"Piliyandala","province":"Western","postal_code":"10400"}
+
+{"action":"delete","route_id":"3"}
+
+{"action":"create","route_name":"100-Colombo","city":"Pettah - Panadura / Moratuwa","province":"Western Province","postal_code":"01100"}
+
+
