@@ -1,42 +1,41 @@
 import React, { useState, useEffect } from 'react';
-import { FiMapPin, FiDollarSign, FiMap, FiAlertCircle, FiArrowRight } from 'react-icons/fi';
+import { FiTruck, FiClock, FiMapPin, FiAlertCircle, FiPhone, FiGrid, FiSearch } from 'react-icons/fi';
 
-export default function ViewRoutes() {
-  const [routes, setRoutes] = useState([]);
+export default function ViewTimetable() {
+  const [buses, setBuses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    fetchRoutes();
+    fetchData();
   }, []);
 
-  const fetchRoutes = async () => {
+  const fetchData = async () => {
     try {
-      const response = await fetch('http://localhost/qrsys/api/get_routes.php');
+      // Fetch buses with joined route information from the API
+      const response = await fetch('http://localhost/qrsys/api/bus_api.php');
       const data = await response.json();
-      
+
       if (Array.isArray(data)) {
-        setRoutes(data);
-      } else {
-        setRoutes([]);
+        setBuses(data);
       }
     } catch (err) {
-      console.error('Error fetching routes:', err);
-      setError('Failed to load routes. Please try again later.');
+      console.error('Error fetching data:', err);
+      setError('Failed to load bus timetable. Please try again later.');
     } finally {
       setLoading(false);
     }
   };
 
-  const filteredRoutes = routes.filter(route => {
+  const filteredBuses = buses.filter(bus => {
     if (!searchTerm) return true;
     const search = searchTerm.toLowerCase();
     return (
-      route.route_name?.toLowerCase().includes(search) ||
-      route.start_city?.toLowerCase().includes(search) ||
-      route.end_city?.toLowerCase().includes(search) ||
-      route.province?.toLowerCase().includes(search)
+      bus.bus_no?.toLowerCase().includes(search) ||
+      bus.route_name?.toLowerCase().includes(search) ||
+      bus.start_city?.toLowerCase().includes(search) ||
+      bus.end_city?.toLowerCase().includes(search)
     );
   });
 
@@ -45,7 +44,7 @@ export default function ViewRoutes() {
       <div style={styles.container}>
         <div style={styles.loadingContainer}>
           <div style={styles.spinner}></div>
-          <p style={styles.loadingText}>Loading routes...</p>
+          <p style={styles.loadingText}>Loading timetable...</p>
         </div>
       </div>
     );
@@ -58,7 +57,7 @@ export default function ViewRoutes() {
           <FiAlertCircle size={48} color="#dc2626" />
           <h3 style={styles.errorTitle}>Oops! Something went wrong</h3>
           <p style={styles.errorText}>{error}</p>
-          <button style={styles.retryButton} onClick={fetchRoutes}>
+          <button style={styles.retryButton} onClick={fetchData}>
             Try Again
           </button>
         </div>
@@ -71,11 +70,11 @@ export default function ViewRoutes() {
       {/* Header Section */}
       <div style={styles.header}>
         <div style={styles.headerContent}>
-          <FiMap size={40} color="#10b981" />
+          <FiGrid size={40} color="#1984cc" />
           <div style={styles.headerText}>
-            <h1 style={styles.title}>Available Routes</h1>
+            <h1 style={styles.title}>Bus Timetable</h1>
             <p style={styles.subtitle}>
-              Explore all available bus routes and plan your journey
+              Complete list of all buses with routes and schedules
             </p>
           </div>
         </div>
@@ -83,10 +82,10 @@ export default function ViewRoutes() {
         {/* Search Bar */}
         <div style={styles.searchContainer}>
           <div style={styles.searchWrapper}>
-            <FiMapPin size={20} color="#94a3b8" style={styles.searchIcon} />
+            <FiSearch size={20} color="#94a3b8" style={styles.searchIcon} />
             <input
               type="text"
-              placeholder="Search by city, route name, or province..."
+              placeholder="Search by bus number, route, or city..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               style={styles.searchInput}
@@ -94,24 +93,24 @@ export default function ViewRoutes() {
           </div>
           <div style={styles.statsBar}>
             <span style={styles.statText}>
-              {filteredRoutes.length} {filteredRoutes.length === 1 ? 'Route' : 'Routes'} Found
+              {filteredBuses.length} {filteredBuses.length === 1 ? 'Bus' : 'Buses'} Available
             </span>
           </div>
         </div>
       </div>
 
-      {/* Routes List */}
+      {/* Bus List */}
       <div style={styles.content}>
-        {filteredRoutes.length === 0 ? (
+        {filteredBuses.length === 0 ? (
           <div style={styles.emptyState}>
-            <FiMap size={64} color="#cbd5e1" />
+            <FiTruck size={64} color="#cbd5e1" />
             <h3 style={styles.emptyTitle}>
-              {searchTerm ? 'No Routes Found' : 'No Routes Available'}
+              {searchTerm ? 'No Buses Found' : 'No Buses Available'}
             </h3>
             <p style={styles.emptyText}>
               {searchTerm
-                ? 'Try adjusting your search criteria or browse all routes.'
-                : 'There are currently no routes available. Please check back later.'}
+                ? 'Try adjusting your search criteria or browse all buses.'
+                : 'There are currently no buses in the system. Please check back later.'}
             </p>
             {searchTerm && (
               <button 
@@ -123,81 +122,101 @@ export default function ViewRoutes() {
             )}
           </div>
         ) : (
-          <div style={styles.routeGrid}>
-            {filteredRoutes.map((route) => (
-              <div key={route.route_id} style={styles.routeCard}>
-                {/* Route Name Badge */}
-                <div style={styles.routeBadge}>
-                  <FiMap size={18} color="#fff" />
-                  <span style={styles.routeBadgeText}>
-                    {route.route_name || `Route ${route.route_id}`}
-                  </span>
-                </div>
-
-                {/* Journey Path */}
-                <div style={styles.journeySection}>
-                  {/* Start City */}
-                  <div style={styles.locationBox}>
-                    <div style={styles.locationIcon}>
-                      <FiMapPin size={20} color="#10b981" />
+          <div style={styles.busGrid}>
+            {filteredBuses.map((bus) => {
+              return (
+                <div key={bus.bus_id} style={styles.busCard}>
+                  {/* Bus Number Header */}
+                  <div style={styles.busHeader}>
+                    <div style={styles.busNumberBadge}>
+                      <FiTruck size={20} color="#fff" />
+                      <span style={styles.busNumber}>Bus {bus.bus_no}</span>
                     </div>
-                    <div style={styles.locationInfo}>
-                      <span style={styles.locationLabel}>From</span>
-                      <h3 style={styles.locationCity}>
-                        {route.start_city || 'Not specified'}
-                      </h3>
+                    <div style={styles.seatsBadge}>
+                      {bus.no_of_seats} Seats
                     </div>
                   </div>
 
-                  {/* Arrow Divider */}
-                  <div style={styles.journeyArrow}>
-                    <FiArrowRight size={32} color="#3b82f6" />
+                  {/* Route Information */}
+                  <div style={styles.routeSection}>
+                    <div style={styles.routeLabel}>
+                      <FiMapPin size={16} color="#1984cc" />
+                      <span style={styles.routeLabelText}>Route</span>
+                    </div>
+                    <h3 style={styles.routeNameText}>
+                      {bus.route_name || bus.bus_route || 'Route Information'}
+                    </h3>
+                    
+                    {bus.start_city && bus.end_city && (
+                      <div style={styles.journeyPath}>
+                        <div style={styles.cityBox}>
+                          <div style={{...styles.cityDot, background: '#10b981'}}></div>
+                          <span style={styles.cityName}>{bus.start_city}</span>
+                        </div>
+                        <div style={styles.journeyLine}></div>
+                        <div style={styles.cityBox}>
+                          <div style={{...styles.cityDot, background: '#ef4444'}}></div>
+                          <span style={styles.cityName}>{bus.end_city}</span>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Additional Route Details */}
+                    {(bus.province || bus.price) && (
+                      <div style={styles.routeDetails}>
+                        {bus.province && (
+                          <div style={styles.routeDetailItem}>
+                            <span style={styles.routeDetailLabel}>Province:</span>
+                            <span style={styles.routeDetailValue}>{bus.province}</span>
+                          </div>
+                        )}
+                        {bus.price && (
+                          <div style={styles.routeDetailItem}>
+                            <span style={styles.routeDetailLabel}>Fare:</span>
+                            <span style={styles.routeDetailValue}>Rs. {parseFloat(bus.price).toFixed(2)}</span>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
 
-                  {/* End City */}
-                  <div style={styles.locationBox}>
-                    <div style={styles.locationIcon}>
-                      <FiMapPin size={20} color="#ef4444" />
-                    </div>
-                    <div style={styles.locationInfo}>
-                      <span style={styles.locationLabel}>To</span>
-                      <h3 style={styles.locationCity}>
-                        {route.end_city || 'Not specified'}
-                      </h3>
+                  {/* Schedule Section */}
+                  <div style={styles.scheduleSection}>
+                    <div style={styles.scheduleRow}>
+                      <div style={styles.scheduleItem}>
+                        <FiClock size={16} color="#1984cc" />
+                        <div style={styles.scheduleInfo}>
+                          <span style={styles.scheduleLabel}>Departure</span>
+                          <span style={styles.scheduleTime}>
+                            {bus.start_time || 'N/A'}
+                          </span>
+                        </div>
+                      </div>
+                      <div style={styles.timeDivider}>→</div>
+                      <div style={styles.scheduleItem}>
+                        <FiClock size={16} color="#ec4899" />
+                        <div style={styles.scheduleInfo}>
+                          <span style={styles.scheduleLabel}>Arrival</span>
+                          <span style={styles.scheduleTime}>
+                            {bus.reach_time || 'N/A'}
+                          </span>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Route Details */}
-                <div style={styles.detailsSection}>
-                  {route.province && (
-                    <div style={styles.detailItem}>
-                      <span style={styles.detailLabel}>Province:</span>
-                      <span style={styles.detailValue}>{route.province}</span>
+                  {/* Contact Information */}
+                  {bus.bus_service_tel && (
+                    <div style={styles.contactSection}>
+                      <FiPhone size={16} color="#64748b" />
+                      <span style={styles.contactText}>{bus.bus_service_tel}</span>
                     </div>
                   )}
-                  {route.postal_code && (
-                    <div style={styles.detailItem}>
-                      <span style={styles.detailLabel}>Postal Code:</span>
-                      <span style={styles.detailValue}>{route.postal_code}</span>
-                    </div>
-                  )}
-                </div>
 
-                {/* Price Section */}
-                {route.price && (
-                  <div style={styles.priceSection}>
-                    <FiDollarSign size={20} color="#10b981" />
-                    <div style={styles.priceInfo}>
-                      <span style={styles.priceLabel}>Fare</span>
-                      <span style={styles.priceValue}>
-                        Rs. {parseFloat(route.price).toFixed(2)}
-                      </span>
-                    </div>
-                  </div>
-                )}
-              </div>
-            ))}
+
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
@@ -247,7 +266,7 @@ export default function ViewRoutes() {
 const styles = {
   container: {
     minHeight: '100vh',
-    background: 'linear-gradient(to bottom, #f0fdf4, #dbeafe)',
+    background: 'linear-gradient(to bottom, #faf5ff, #f3e8ff)',
     paddingBottom: '60px',
   },
   loadingContainer: {
@@ -261,7 +280,7 @@ const styles = {
     width: '50px',
     height: '50px',
     border: '4px solid #e2e8f0',
-    borderTop: '4px solid #10b981',
+    borderTop: '4px solid #1984cc',
     borderRadius: '50%',
     animation: 'spin 1s linear infinite',
   },
@@ -295,7 +314,7 @@ const styles = {
   },
   retryButton: {
     padding: '12px 32px',
-    background: '#10b981',
+    background: '#1984cc',
     color: '#fff',
     border: 'none',
     borderRadius: '8px',
@@ -396,7 +415,7 @@ const styles = {
   },
   clearButton: {
     padding: '10px 24px',
-    background: '#10b981',
+    background: '#8b5cf6',
     color: '#fff',
     border: 'none',
     borderRadius: '8px',
@@ -404,12 +423,12 @@ const styles = {
     fontWeight: 600,
     cursor: 'pointer',
   },
-  routeGrid: {
+  busGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))',
     gap: '24px',
   },
-  routeCard: {
+  busCard: {
     background: '#fff',
     borderRadius: '16px',
     padding: '24px',
@@ -418,116 +437,183 @@ const styles = {
     transition: 'all 0.3s ease',
     cursor: 'pointer',
   },
-  routeBadge: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '8px',
-    background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-    color: '#fff',
-    padding: '8px 16px',
-    borderRadius: '8px',
-    fontSize: '14px',
-    fontWeight: 700,
-    marginBottom: '24px',
-    boxShadow: '0 4px 6px rgba(16, 185, 129, 0.3)',
-  },
-  routeBadgeText: {
-    fontSize: '15px',
-  },
-  journeySection: {
+  busHeader: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: '24px',
-    gap: '12px',
+    marginBottom: '20px',
   },
-  locationBox: {
-    flex: 1,
+  busNumberBadge: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '10px',
+    background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+    color: '#fff',
+    padding: '10px 18px',
+    borderRadius: '10px',
+    fontSize: '16px',
+    fontWeight: 700,
+    boxShadow: '0 4px 6px rgba(139, 92, 246, 0.3)',
+  },
+  busNumber: {
+    fontSize: '16px',
+  },
+  seatsBadge: {
+    padding: '6px 14px',
+    background: '#f1f5f9',
+    color: '#475569',
+    borderRadius: '8px',
+    fontSize: '13px',
+    fontWeight: 600,
+  },
+  routeSection: {
+    marginBottom: '20px',
+    padding: '16px',
+    background: '#faf5ff',
+    borderRadius: '12px',
+    border: '1px solid #e9d5ff',
+  },
+  routeLabel: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+    marginBottom: '8px',
+  },
+  routeLabelText: {
+    fontSize: '12px',
+    color: '#7c3aed',
+    fontWeight: 600,
+    textTransform: 'uppercase',
+    letterSpacing: '0.5px',
+  },
+  routeNameText: {
+    fontSize: '18px',
+    fontWeight: 700,
+    color: '#1e293b',
+    marginBottom: '12px',
+  },
+  journeyPath: {
     display: 'flex',
     alignItems: 'center',
     gap: '12px',
+  },
+  cityBox: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    flex: 1,
+  },
+  cityDot: {
+    width: '10px',
+    height: '10px',
+    borderRadius: '50%',
+    flexShrink: 0,
+  },
+  cityName: {
+    fontSize: '14px',
+    fontWeight: 600,
+    color: '#475569',
+  },
+  journeyLine: {
+    flex: '0 0 30px',
+    height: '2px',
+    background: '#cbd5e1',
+  },
+  routeDetails: {
+    display: 'flex',
+    gap: '12px',
+    marginTop: '12px',
+    paddingTop: '12px',
+    borderTop: '1px solid #e9d5ff',
+  },
+  routeDetailItem: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '2px',
+  },
+  routeDetailLabel: {
+    fontSize: '11px',
+    color: '#7c3aed',
+    fontWeight: 500,
+    textTransform: 'uppercase',
+  },
+  routeDetailValue: {
+    fontSize: '13px',
+    fontWeight: 600,
+    color: '#1e293b',
+  },
+  scheduleSection: {
+    marginBottom: '16px',
+  },
+  scheduleRow: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     padding: '16px',
     background: '#f8fafc',
     borderRadius: '12px',
   },
-  locationIcon: {
+  scheduleItem: {
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'center',
-    width: '40px',
-    height: '40px',
-    background: '#fff',
-    borderRadius: '10px',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
-  },
-  locationInfo: {
+    gap: '10px',
     flex: 1,
   },
-  locationLabel: {
-    display: 'block',
-    fontSize: '12px',
+  scheduleInfo: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '2px',
+  },
+  scheduleLabel: {
+    fontSize: '11px',
     color: '#64748b',
     fontWeight: 500,
-    marginBottom: '4px',
   },
-  locationCity: {
+  scheduleTime: {
     fontSize: '16px',
     fontWeight: 700,
     color: '#1e293b',
-    margin: 0,
   },
-  journeyArrow: {
+  timeDivider: {
+    fontSize: '20px',
+    color: '#8b5cf6',
+    fontWeight: 700,
+    padding: '0 12px',
+  },
+  contactSection: {
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'center',
-  },
-  detailsSection: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(2, 1fr)',
-    gap: '12px',
-    marginBottom: '16px',
-  },
-  detailItem: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '4px',
-    padding: '12px',
-    background: '#f8fafc',
+    gap: '8px',
+    padding: '12px 16px',
+    background: '#eff6ff',
     borderRadius: '8px',
+    marginBottom: '12px',
   },
-  detailLabel: {
-    fontSize: '12px',
-    color: '#64748b',
+  contactText: {
+    fontSize: '14px',
+    fontWeight: 600,
+    color: '#1e40af',
+  },
+  configSection: {
+    padding: '12px 16px',
+    background: '#fefce8',
+    borderRadius: '8px',
+    border: '1px solid #fde047',
+  },
+  configItem: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+  },
+  configLabel: {
+    fontSize: '13px',
+    color: '#713f12',
     fontWeight: 500,
   },
-  detailValue: {
-    fontSize: '14px',
-    color: '#1e293b',
-    fontWeight: 600,
-  },
-  priceSection: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-    padding: '16px',
-    background: 'linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)',
-    borderRadius: '12px',
-    border: '2px solid #6ee7b7',
-  },
-  priceInfo: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-  },
-  priceLabel: {
-    fontSize: '14px',
-    color: '#065f46',
-    fontWeight: 600,
-  },
-  priceValue: {
-    fontSize: '20px',
+  configValue: {
+    fontSize: '13px',
     fontWeight: 700,
-    color: '#065f46',
+    color: '#854d0e',
   },
   footer: {
     background: '#1e293b',
@@ -594,12 +680,12 @@ styleSheet.textContent = `
   }
   
   input:focus {
-    border-color: #10b981 !important;
-    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1) !important;
+    border-color: #8b5cf6 !important;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1) !important;
   }
   
   @media (hover: hover) {
-    .route-card:hover {
+    .bus-card:hover {
       transform: translateY(-4px);
       box-shadow: 0 12px 24px rgba(0,0,0,0.15) !important;
     }
@@ -611,7 +697,7 @@ styleSheet.textContent = `
   }
   
   @media (max-width: 768px) {
-    .route-grid {
+    .bus-grid {
       grid-template-columns: 1fr !important;
     }
   }

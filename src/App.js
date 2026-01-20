@@ -4,6 +4,9 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Home from "./pages/Home";
 import Users from "./components/Users";
 import BusSchedule from "./components/BusSchedule";
+import ViewBusSchedules from "./pages/ViewBusSchedules";
+import ViewRoutes from "./pages/ViewRoutes";
+import ViewTimetable from "./pages/ViewTimetable";
 import BusData from "./components/BusData";
 import BusTable from "./components/BusTable";
 import RouteData from "./components/RouteData";
@@ -88,13 +91,13 @@ function NavBar() {
               <Link className="nav-link" to="/home" onClick={handleHomeClick}>Home</Link>
             </li>
             <li className="nav-item">
-              <Link className="nav-link" to="/busSchedule">View Bus Schedules</Link>
+              <Link className="nav-link" to="/schedules">View Bus Schedules</Link>
             </li>
             <li className="nav-item">
-              <Link className="nav-link" to="/busSchedule">View Routes</Link>
+              <Link className="nav-link" to="/routes">View Routes</Link>
             </li>
             <li className="nav-item">
-              <Link className="nav-link" to="/busSchedule">View Timetable</Link>
+              <Link className="nav-link" to="/timetable">View Timetable</Link>
             </li>
           </ul>
 
@@ -160,6 +163,9 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/home" element={<Home />} />
           <Route path="/signup" element={<Users />} />
+          <Route path="/schedules" element={<ViewBusSchedules />} />
+          <Route path="/routes" element={<ViewRoutes />} />
+          <Route path="/timetable" element={<ViewTimetable />} />
           <Route path="/busSchedule" element={<BusSchedule />} />
 
           {/* Passenger Routes */}

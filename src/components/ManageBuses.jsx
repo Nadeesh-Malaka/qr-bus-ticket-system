@@ -15,7 +15,7 @@ export default function ManageBuses() {
 
   const [formData, setFormData] = useState({
     bus_no: '',
-    bus_route: '',
+    route_id: '',
     no_of_seats: '',
     bus_service_tel: '',
     start_time: '',
@@ -122,7 +122,7 @@ export default function ManageBuses() {
     setEditingBus(bus);
     setFormData({
       bus_no: bus.bus_no || '',
-      bus_route: bus.bus_route || '',
+      route_id: bus.route_id || '',
       no_of_seats: bus.no_of_seats || '',
       bus_service_tel: bus.bus_service_tel || '',
       start_time: bus.start_time || '',
@@ -188,7 +188,7 @@ export default function ManageBuses() {
 
   const filteredBuses = buses.filter(bus =>
     bus.bus_no?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    bus.bus_route?.toLowerCase().includes(searchTerm.toLowerCase())
+    bus.route_name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -261,7 +261,7 @@ export default function ManageBuses() {
               {filteredBuses.map((bus) => (
                 <tr key={bus.bus_id}>
                   <td><strong>{bus.bus_no}</strong></td>
-                  <td>{bus.bus_route}</td>
+                  <td>{bus.route_name || bus.bus_route || 'N/A'}</td>
                   <td>{bus.no_of_seats} ({bus.seat_rows}×{bus.seat_columns})</td>
                   <td>{bus.bus_service_tel}</td>
                   <td>{bus.start_time}</td>
@@ -353,13 +353,13 @@ export default function ManageBuses() {
                       <label className="form-label required">Assigned Route</label>
                       <select
                         className="form-select"
-                        value={formData.bus_route}
-                        onChange={(e) => setFormData({...formData, bus_route: e.target.value})}
+                        value={formData.route_id}
+                        onChange={(e) => setFormData({...formData, route_id: e.target.value})}
                         required
                       >
                         <option value="">Select a route</option>
                         {routes.map((route) => (
-                          <option key={route.route_id} value={route.route_name}>
+                          <option key={route.route_id} value={route.route_id}>
                             {route.route_name} ({route.start_city} → {route.end_city})
                           </option>
                         ))}

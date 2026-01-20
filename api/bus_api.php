@@ -23,7 +23,20 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 /* GET - Fetch all buses */
 if ($method === 'GET') {
-    $result = $conn->query("SELECT * FROM bus ORDER BY bus_no");
+    // Join with route table to get complete route information
+    $sql = "SELECT 
+                b.*,
+                r.route_name,
+                r.start_city,
+                r.end_city,
+                r.province,
+                r.postal_code,
+                r.price
+            FROM bus b
+            LEFT JOIN route r ON b.route_id = r.route_id
+            ORDER BY b.bus_no";
+    
+    $result = $conn->query($sql);
     
     $buses = [];
     while ($row = $result->fetch_assoc()) {
@@ -45,14 +58,14 @@ if ($method === 'POST') {
     
     if ($data['action'] === 'create') {
         $stmt = $conn->prepare(
-            "INSERT INTO bus (bus_no, bus_route, no_of_seats, bus_service_tel, start_time, reach_time, seat_rows, seat_columns, aisle_after_column, driver_id, operator_id) 
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+            "INSERT INTO bus (bus_no, route_id, bus_route, no_of_seats, bus_service_tel, start_time, reach_time, seat_rows, seat_columns, aisle_after_column, driver_id, operator_id) 
+             VALUES (?, ?, '', ?, ?, ?, ?, ?, ?, ?, ?, ?)"
         );
         
         $stmt->bind_param(
-            "ssisssiiiss",
+            "siisssiisss",
             $data['bus_no'],
-            $data['bus_route'],
+            $data['route_id'],
             $data['no_of_seats'],
             $data['bus_service_tel'],
             $data['start_time'],
@@ -83,13 +96,13 @@ if ($method === 'POST') {
     /* Handle UPDATE */
     if ($data['action'] === 'update') {
         $stmt = $conn->prepare(
-            "UPDATE bus SET bus_no=?, bus_route=?, no_of_seats=?, bus_service_tel=?, start_time=?, reach_time=?, seat_rows=?, seat_columns=?, aisle_after_column=?, driver_id=?, operator_id=? WHERE bus_id=?"
+            "UPDATE bus SET bus_no=?, route_id=?, no_of_seats=?, bus_service_tel=?, start_time=?, reach_time=?, seat_rows=?, seat_columns=?, aisle_after_column=?, driver_id=?, operator_id=? WHERE bus_id=?"
         );
         
         $stmt->bind_param(
-            "ssisssiiissi",
+            "siisssiisssi",
             $data['bus_no'],
-            $data['bus_route'],
+            $data['route_id'],
             $data['no_of_seats'],
             $data['bus_service_tel'],
             $data['start_time'],
