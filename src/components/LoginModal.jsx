@@ -43,7 +43,7 @@ export default function LoginModal({ show, onClose }) {
         if (data.role === "passenger") {
           navigate("/passenger/dashboard");
         } else if (data.role === "admin") {
-          navigate("/admin/dashboard");
+          navigate("/admin");
         } else if (data.role === "bus operator") {
           navigate("/operator/dashboard");
         } else if (data.role === "bus driver") {

@@ -15,7 +15,6 @@ import AddSchedule from "./components/AddSchedule";
 import BusTracker from "./components/BusTracker";
 import BusSeatLayout from './components/BusSeatLayout';
 import BookingHistory from './components/BookingHistory';
-import AdminDashboardNew from './pages/AdminDashboardNew';
 import AdminDashboardLayout from './pages/AdminDashboardLayout';
 import AdminDashboardMain from './pages/AdminDashboardMain';
 import ManageRoutes from './components/ManageRoutes';
@@ -90,9 +89,9 @@ function NavBar() {
             <li className="nav-item">
               <Link className="nav-link" to="/home" onClick={handleHomeClick}>Home</Link>
             </li>
-            <li className="nav-item">
+            {/* <li className="nav-item">
               <Link className="nav-link" to="/schedules">View Bus Schedules</Link>
-            </li>
+            </li> */}
             <li className="nav-item">
               <Link className="nav-link" to="/routes">View Routes</Link>
             </li>
@@ -214,12 +213,6 @@ function App() {
             <Route path="feedback" element={<CustomerFeedback />} />
           </Route>
 
-          {/* Legacy Admin Routes for backward compatibility */}
-          <Route path="/admin/dashboard" element={
-            <ProtectedRoute allowedRoles={['admin']}>
-              <AdminDashboardNew />
-            </ProtectedRoute>
-          } />
           <Route path="/admin/add-route" element={
             <ProtectedRoute allowedRoles={['admin']}>
               <RouteData />
