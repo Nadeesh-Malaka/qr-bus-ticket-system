@@ -5,6 +5,8 @@ import '../pages/AdminDashboard.css';
 export default function ManageBuses() {
   const [buses, setBuses] = useState([]);
   const [routes, setRoutes] = useState([]);
+  const [drivers, setDrivers] = useState([]);
+  const [operators, setOperators] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingBus, setEditingBus] = useState(null);
@@ -20,12 +22,15 @@ export default function ManageBuses() {
     reach_time: '',
     seat_rows: '',
     seat_columns: '',
-    aisle_after_column: ''
+    aisle_after_column: '',
+    driver_id: '',
+    operator_id: ''
   });
 
   useEffect(() => {
     fetchBuses();
     fetchRoutes();
+    fetchDriversAndOperators();
   }, []);
 
   const fetchBuses = async () => {
@@ -48,6 +53,19 @@ export default function ManageBuses() {
       setRoutes(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Error fetching routes:', error);
+    }
+  };
+
+  const fetchDriversAndOperators = async () => {
+    try {
+      const response = await fetch('http://localhost/qrsys/api/get_users.php');
+      const data = await response.json();
+      if (Array.isArray(data)) {
+        setDrivers(data.filter(user => user.user_type === 'bus driver' || user.user_type === 'bus_driver'));
+        setOperators(data.filter(user => user.user_type === 'bus_operator' || user.user_type === 'bus operator'));
+      }
+    } catch (error) {
+      console.error('Error fetching users:', error);
     }
   };
 
@@ -111,7 +129,9 @@ export default function ManageBuses() {
       reach_time: bus.reach_time || '',
       seat_rows: bus.seat_rows || '',
       seat_columns: bus.seat_columns || '',
-      aisle_after_column: bus.aisle_after_column || ''
+      aisle_after_column: bus.aisle_after_column || '',
+      driver_id: bus.driver_id || '',
+      operator_id: bus.operator_id || ''
     });
     setShowModal(true);
   };
@@ -154,7 +174,9 @@ export default function ManageBuses() {
       reach_time: '',
       seat_rows: '',
       seat_columns: '',
-      aisle_after_column: ''
+      aisle_after_column: '',
+      driver_id: '',
+      operator_id: ''
     });
     setShowModal(true);
   };
@@ -358,6 +380,48 @@ export default function ManageBuses() {
                         required
                         min="1"
                       />
+                    </div>
+                  </div>
+
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label className="form-label required">Assigned Driver</label>
+                      <select
+                        className="form-select"
+                        value={formData.driver_id}
+                        onChange={(e) => setFormData({...formData, driver_id: e.target.value})}
+                        required
+                      >
+                        <option value="">Select a driver</option>
+                        {drivers.map((driver) => (
+                          <option key={driver.user_id} value={driver.user_id}>
+                            {driver.full_name} ({driver.user_id})
+                          </option>
+                        ))}
+                      </select>
+                      <small style={{ color: '#64748b', fontSize: '12px', marginTop: '4px', display: 'block' }}>
+                        Bus driver assigned to this bus
+                      </small>
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label required">Assigned Operator</label>
+                      <select
+                        className="form-select"
+                        value={formData.operator_id}
+                        onChange={(e) => setFormData({...formData, operator_id: e.target.value})}
+                        required
+                      >
+                        <option value="">Select an operator</option>
+                        {operators.map((operator) => (
+                          <option key={operator.user_id} value={operator.user_id}>
+                            {operator.full_name} ({operator.user_id})
+                          </option>
+                        ))}
+                      </select>
+                      <small style={{ color: '#64748b', fontSize: '12px', marginTop: '4px', display: 'block' }}>
+                        Bus operator managing this bus
+                      </small>
                     </div>
                   </div>
                 </div>
