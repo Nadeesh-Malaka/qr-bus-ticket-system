@@ -47,7 +47,7 @@ export default function ManageUsers() {
       const payload = {
         action: editingUser ? 'update' : 'create',
         ...formData,
-        ...(editingUser && { user_id: editingUser.user_id })
+        ...(editingUser && { id: editingUser.id })
       };
 
       const response = await fetch('http://localhost/qrsys/api/user_api.php', {
@@ -84,7 +84,7 @@ export default function ManageUsers() {
       city: user.city || '',
       gmail: user.gmail || '',
       password: '',
-      user_type: user.user_type || 'passenger'
+      user_type: (user.user_type || 'passenger').replace(/_/g, ' ')
     });
     setShowModal(true);
   };
@@ -98,7 +98,7 @@ export default function ManageUsers() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           action: 'delete',
-          user_id: userId
+          id: userId
         })
       });
 
@@ -168,14 +168,17 @@ export default function ManageUsers() {
   };
 
   const getRoleBadge = (role) => {
+    // Normalize role to handle both formats
+    const normalizedRole = role?.toLowerCase().replace(/_/g, ' ').trim();
+    
     const roleStyles = {
       admin: { bg: '#ef4444', label: 'Administrator' },
-      'bus_operator': { bg: '#f59e0b', label: 'Bus Operator' },
+      'bus operator': { bg: '#f59e0b', label: 'Bus Operator' },
       'bus driver': { bg: '#06b6d4', label: 'Bus Driver' },
       passenger: { bg: '#10b981', label: 'Passenger' }
     };
 
-    const style = roleStyles[role] || roleStyles.passenger;
+    const style = roleStyles[normalizedRole] || roleStyles.passenger;
 
     return (
       <span style={{
@@ -274,17 +277,17 @@ export default function ManageUsers() {
             </thead>
             <tbody>
               {filteredUsers.map((user) => (
-                <tr key={user.user_id}>
-                  <td><strong>PAS{String(user.user_id).padStart(6, '0')}</strong></td>
+                <tr key={user.id}>
+                  <td><strong>{user.user_id || `PAS${String(user.id).padStart(6, '0')}`}</strong></td>
                   <td>{user.full_name}</td>
                   <td style={{ textTransform: 'capitalize' }}>{user.gender}</td>
                   <td>{user.nic}</td>
                   <td>{user.city}</td>
                   <td>{user.mobile_no}</td>
                   <td>
-                    {changingRole === user.user_id ? (
+                    {changingRole === user.id ? (
                       <select
-                        defaultValue={user.user_type}
+                        defaultValue={user.user_type?.replace(/_/g, ' ')}
                         onChange={(e) => handleRoleChange(user.user_id, e.target.value)}
                         onBlur={() => setChangingRole(null)}
                         autoFocus
@@ -299,11 +302,11 @@ export default function ManageUsers() {
                       >
                         <option value="passenger">Passenger</option>
                         <option value="bus driver">Bus Driver</option>
-                        <option value="bus_operator">Bus Operator</option>
+                        <option value="bus operator">Bus Operator</option>
                         <option value="admin">Administrator</option>
                       </select>
                     ) : (
-                      <div onClick={() => setChangingRole(user.user_id)} style={{ cursor: 'pointer' }}>
+                      <div onClick={() => setChangingRole(user.id)} style={{ cursor: 'pointer' }}>
                         {getRoleBadge(user.user_type)}
                       </div>
                     )}
@@ -320,7 +323,7 @@ export default function ManageUsers() {
                       </button>
                       <button 
                         className="btn-delete"
-                        onClick={() => handleDelete(user.user_id, user.full_name)}
+                        onClick={() => handleDelete(user.id, user.full_name)}
                       >
                         <FiTrash2 size={14} />
                         <span>Delete</span>
@@ -516,7 +519,7 @@ export default function ManageUsers() {
                       >
                         <option value="passenger">Passenger</option>
                         <option value="bus driver">Bus Driver</option>
-                        <option value="bus_operator">Bus Operator</option>
+                        <option value="bus operator">Bus Operator</option>
                         <option value="admin">Administrator</option>
                       </select>
                       <small style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px', display: 'block' }}>

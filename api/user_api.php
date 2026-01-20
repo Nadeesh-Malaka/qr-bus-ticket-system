@@ -23,7 +23,7 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 /* GET - Fetch all users */
 if ($method === 'GET') {
-    $result = $conn->query("SELECT user_id, full_name, gender, nic, city, mobile_no, gmail, user_type FROM users ORDER BY user_id DESC");
+    $result = $conn->query("SELECT * FROM users ORDER BY id DESC");
     
     $users = [];
     while ($row = $result->fetch_assoc()) {
@@ -48,45 +48,87 @@ if ($method === 'POST') {
         // Hash password
         $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
         
-        $stmt = $conn->prepare(
-            "INSERT INTO users (full_name, gender, nic, city, mobile_no, gmail, password, user_type) 
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
-        );
+        // Generate user_id prefix based on role
+        $prefixMap = [
+            'admin'        => 'ADM',
+            'bus_operator' => 'OPR',
+            'bus operator' => 'OPR',
+            'bus_driver'   => 'DRV',
+            'bus driver'   => 'DRV',
+            'passenger'    => 'PAS'
+        ];
         
-        $stmt->bind_param(
-            "ssssssss",
-            $data['full_name'],
-            $data['gender'],
-            $data['nic'],
-            $data['city'],
-            $data['mobile_no'],
-            $data['gmail'],
-            $hashedPassword,
-            $data['user_type']
-        );
+        // Convert role to database format (replace spaces with underscores)
+        $userType = str_replace(' ', '_', $data['user_type']);
         
-        if ($stmt->execute()) {
+        $conn->begin_transaction();
+        
+        try {
+            // Insert user
+            $stmt = $conn->prepare(
+                "INSERT INTO users (full_name, gender, nic, city, mobile_no, gmail, password, user_type, dob, address1, address2) 
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, '', '', '')"
+            );
+            
+            $stmt->bind_param(
+                "ssssssss",
+                $data['full_name'],
+                $data['gender'],
+                $data['nic'],
+                $data['city'],
+                $data['mobile_no'],
+                $data['gmail'],
+                $hashedPassword,
+                $userType
+            );
+            
+            if (!$stmt->execute()) {
+                throw new Exception($stmt->error);
+            }
+            
+            $lastId = $conn->insert_id;
+            
+            // Generate formatted user_id
+            $prefix = $prefixMap[$userType] ?? 'PAS';
+            $userId = $prefix . str_pad($lastId, 6, "0", STR_PAD_LEFT);
+            
+            // Update user_id
+            $updateStmt = $conn->prepare("UPDATE users SET user_id=? WHERE id=?");
+            $updateStmt->bind_param("si", $userId, $lastId);
+            
+            if (!$updateStmt->execute()) {
+                throw new Exception($updateStmt->error);
+            }
+            
+            $conn->commit();
+            
             echo json_encode([
                 "status" => true,
                 "message" => "User created successfully",
-                "user_id" => $conn->insert_id
+                "user_id" => $userId
             ]);
-        } else {
+            
+            $stmt->close();
+            $updateStmt->close();
+        } catch (Exception $e) {
+            $conn->rollback();
             echo json_encode([
                 "status" => false,
-                "message" => $stmt->error
+                "message" => $e->getMessage()
             ]);
         }
-        $stmt->close();
         exit;
     }
     
     /* UPDATE USER */
     if ($data['action'] === 'update') {
+        // Convert role to database format (replace spaces with underscores)
+        $db_user_type = str_replace(' ', '_', $data['user_type']);
+        
         if (empty($data['password'])) {
             // Update without changing password
             $stmt = $conn->prepare(
-                "UPDATE users SET full_name=?, gender=?, nic=?, city=?, mobile_no=?, gmail=?, user_type=? WHERE user_id=?"
+                "UPDATE users SET full_name=?, gender=?, nic=?, city=?, mobile_no=?, gmail=?, user_type=? WHERE id=?"
             );
             
             $stmt->bind_param(
@@ -97,15 +139,15 @@ if ($method === 'POST') {
                 $data['city'],
                 $data['mobile_no'],
                 $data['gmail'],
-                $data['user_type'],
-                $data['user_id']
+                $db_user_type,
+                $data['id']
             );
         } else {
             // Update with new password
             $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
             
             $stmt = $conn->prepare(
-                "UPDATE users SET full_name=?, gender=?, nic=?, city=?, mobile_no=?, gmail=?, password=?, user_type=? WHERE user_id=?"
+                "UPDATE users SET full_name=?, gender=?, nic=?, city=?, mobile_no=?, gmail=?, password=?, user_type=? WHERE id=?"
             );
             
             $stmt->bind_param(
@@ -117,8 +159,8 @@ if ($method === 'POST') {
                 $data['mobile_no'],
                 $data['gmail'],
                 $hashedPassword,
-                $data['user_type'],
-                $data['user_id']
+                $db_user_type,
+                $data['id']
             );
         }
         
@@ -139,8 +181,16 @@ if ($method === 'POST') {
     
     /* DELETE USER */
     if ($data['action'] === 'delete') {
-        $stmt = $conn->prepare("DELETE FROM users WHERE user_id=?");
-        $stmt->bind_param("i", $data['user_id']);
+        if (!isset($data['id']) || empty($data['id'])) {
+            echo json_encode([
+                "status" => false,
+                "message" => "User ID is required"
+            ]);
+            exit;
+        }
+        
+        $stmt = $conn->prepare("DELETE FROM users WHERE id=?");
+        $stmt->bind_param("i", $data['id']);
         
         if ($stmt->execute()) {
             echo json_encode([

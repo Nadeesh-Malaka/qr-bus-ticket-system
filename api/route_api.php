@@ -29,16 +29,17 @@ file_put_contents("debug.log", $raw . PHP_EOL, FILE_APPEND);
 /* ---------- CREATE ---------- */
 if ($action === "create") {
     $stmt = $conn->prepare(
-        "INSERT INTO route (route_name, start_city, end_city, province, postal_code)
-         VALUES (?, ?, ?, ?, ?)"
+        "INSERT INTO route (route_name, start_city, end_city, province, postal_code, price)
+         VALUES (?, ?, ?, ?, ?, ?)"
     );
     $stmt->bind_param(
-        "ssssi",
+        "ssssid",
         $data['route_name'],
         $data['start_city'],
         $data['end_city'],
         $data['province'],
-        $data['postal_code']
+        $data['postal_code'],
+        $data['price']
     );
 
     echo json_encode(["status" => $stmt->execute()]);
@@ -49,17 +50,18 @@ if ($action === "create") {
 if ($action === "update") {
     $stmt = $conn->prepare(
         "UPDATE route
-         SET route_name=?, start_city=?, end_city=?, province=?, postal_code=?
+         SET route_name=?, start_city=?, end_city=?, province=?, postal_code=?, price=?
          WHERE route_id=?"
     );
 
     $stmt->bind_param(
-        "ssssii",
+        "ssssidi",
         $data['route_name'],
         $data['start_city'],
         $data['end_city'],
         $data['province'],
         $data['postal_code'],
+        $data['price'],
         $data['route_id']
     );
 
@@ -84,7 +86,7 @@ if ($action === "delete") {
 
 /* ---------- READ ---------- */
 $result = $conn->query(
-    "SELECT route_id, route_name, start_city, end_city, province, postal_code FROM route"
+    "SELECT route_id, route_name, start_city, end_city, province, postal_code, price FROM route"
 );
 
 $routes = [];

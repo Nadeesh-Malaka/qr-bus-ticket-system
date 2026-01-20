@@ -15,7 +15,8 @@ export default function ManageRoutes() {
     start_city: '',
     end_city: '',
     province: '',
-    postal_code: ''
+    postal_code: '',
+    price: ''
   });
 
   useEffect(() => {
@@ -78,7 +79,8 @@ export default function ManageRoutes() {
       start_city: route.start_city,
       end_city: route.end_city,
       province: route.province,
-      postal_code: route.postal_code
+      postal_code: route.postal_code,
+      price: route.price || ''
     });
     setShowModal(true);
   };
@@ -117,7 +119,8 @@ export default function ManageRoutes() {
       start_city: '',
       end_city: '',
       province: '',
-      postal_code: ''
+      postal_code: '',
+      price: ''
     });
     setShowModal(true);
   };
@@ -130,7 +133,8 @@ export default function ManageRoutes() {
       start_city: '',
       end_city: '',
       province: '',
-      postal_code: ''
+      postal_code: '',
+      price: ''
     });
   };
 
@@ -203,6 +207,7 @@ export default function ManageRoutes() {
                 <th>End City</th>
                 <th>Province</th>
                 <th>Postal Code</th>
+                <th>Price (LKR)</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -224,6 +229,11 @@ export default function ManageRoutes() {
                   </td>
                   <td>{route.province}</td>
                   <td>{route.postal_code}</td>
+                  <td>
+                    <strong style={{ color: '#10b981' }}>
+                      Rs. {parseFloat(route.price || 0).toFixed(2)}
+                    </strong>
+                  </td>
                   <td>
                     <div className="table-actions">
                       <button 
@@ -412,6 +422,25 @@ export default function ManageRoutes() {
                         onChange={(e) => setFormData({...formData, postal_code: e.target.value})}
                         required
                       />
+                    </div>
+                  </div>
+
+                  <div className="form-row" style={{ marginTop: '16px' }}>
+                    <div className="form-group">
+                      <label className="form-label required">Route Price (LKR)</label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        className="form-input"
+                        placeholder="e.g., 500.00"
+                        value={formData.price}
+                        onChange={(e) => setFormData({...formData, price: e.target.value})}
+                        required
+                      />
+                      <small style={{ color: '#64748b', fontSize: '12px', marginTop: '4px', display: 'block' }}>
+                        Fixed price for this route based on distance
+                      </small>
                     </div>
                   </div>
                 </div>

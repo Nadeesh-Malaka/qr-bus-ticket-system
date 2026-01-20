@@ -38,11 +38,18 @@ if (!in_array($user_type, $valid_types)) {
     exit;
 }
 
+// Convert role to database format (replace spaces with underscores)
+$db_user_type = str_replace(' ', '_', $user_type);
+
+// Debug logging
+error_log("Updating user_id: $user_id to role: $db_user_type (original: $user_type)");
+
 // Update user type
 $stmt = $conn->prepare("UPDATE users SET user_type = ? WHERE user_id = ?");
-$stmt->bind_param("ss", $user_type, $user_id);
+$stmt->bind_param("ss", $db_user_type, $user_id);
 
 if ($stmt->execute()) {
+    error_log("Affected rows: " . $stmt->affected_rows);
     if ($stmt->affected_rows > 0) {
         echo json_encode([
             "status" => true,
