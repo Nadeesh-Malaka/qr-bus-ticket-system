@@ -8,6 +8,7 @@ import "../assets/css/jquery.fancybox.min.css";
 import "../assets/css/aos.css";
 import "../assets/css/style.css";
 import "../assets/styles.css";
+import Footer from "../components/Footer";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -524,38 +525,8 @@ export default function Home() {
     </div>
    </section>
       
-      {/* Footer */}
-      <footer className="site-footer">
-        <div className="container">
-          <div className="row">
-            <div className="col-lg-8 ml-auto">
-              <div className="row">
-                {[...Array(4)].map((_, idx) => (
-                  <div className="col-lg-3" key={idx}>
-                    <h2 className="footer-heading mb-4">Quick Links</h2>
-                    <ul className="list-unstyled">
-                      <li><a href="#">About Us</a></li>
-                      <li><a href="#">Testimonials</a></li>
-                      <li><a href="#">Terms of Service</a></li>
-                      <li><a href="#">Privacy</a></li>
-                      <li><a href="#">Contact Us</a></li>
-                    </ul>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-          <div className="row pt-5 mt-5 text-center">
-            <div className="col-md-12">
-              <div className="border-top pt-5">
-                <p>
-                  Copyright &copy; {new Date().getFullYear()} All rights reserved
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </footer>
+      {/* Footer Section */}
+      <Footer />
 
     </div>
   );
