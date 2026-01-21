@@ -139,7 +139,7 @@ export default function OperatorTrackBuses() {
         )}
       </div>
 
-      {/* Implementation Notice */}
+      {/* Implementation Notice
       <div className="dashboard-section">
         <div className="info-card">
           <h3>Implementation Note</h3>
@@ -154,7 +154,7 @@ export default function OperatorTrackBuses() {
             This interface provides the frontend structure. Backend GPS integration and map APIs need to be configured.
           </p>
         </div>
-      </div>
+      </div> */}
 
       {/* Custom Styles */}
       <style jsx>{`
