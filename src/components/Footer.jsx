@@ -26,7 +26,7 @@ export default function Footer() {
               marginBottom: '20px',
               letterSpacing: '-0.3px'
             }}>
-              QR Bus System
+              ExpressBook
             </h3>
             <p style={{ 
               fontSize: '14px', 
@@ -218,7 +218,7 @@ export default function Footer() {
             fontSize: '14px', 
             color: '#94a3b8'
           }}>
-            © {new Date().getFullYear()} QR Bus System. All rights reserved.
+            © {new Date().getFullYear()} ExpressBook. All rights reserved.
           </p>
           <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
             <span style={{ fontSize: '12px', color: '#64748b' }}>Made with ❤️ for travelers</span>

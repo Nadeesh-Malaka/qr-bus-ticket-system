@@ -1,6 +1,6 @@
 import { Routes, Route, Link, useNavigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ProtectedRoute from "./components/ProtectedRoute";
 import Home from "./pages/Home";
 import Users from "./components/Users";
@@ -43,6 +43,20 @@ function NavBar() {
   const navigate = useNavigate();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    if (showProfileDropdown) {
+      const handleClickOutside = (e) => {
+        if (!e.target.closest('.dropdown')) {
+          setShowProfileDropdown(false);
+        }
+      };
+      document.addEventListener('click', handleClickOutside);
+      return () => document.removeEventListener('click', handleClickOutside);
+    }
+  }, [showProfileDropdown]);
 
   // Make functions globally accessible for modal cross-navigation
   window.openLoginModal = () => {
@@ -83,69 +97,317 @@ function NavBar() {
   };
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-light bg-light">
-      <div className="container-fluid">
-        <Link className="navbar-brand" to="/home" onClick={handleLogoClick}>
-          <strong>QR Bus System</strong>
+    <nav className="navbar navbar-expand-lg sticky-top" style={{
+      backgroundColor: '#ffffff',
+      boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
+      padding: '15px 0',
+      transition: 'all 0.3s ease'
+    }}>
+      <div className="container-fluid" style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 20px' }}>
+        
+        {/* Brand Logo */}
+        <Link 
+          className="navbar-brand" 
+          to="/home" 
+          onClick={handleLogoClick}
+          style={{
+            color: '#2563eb', // Modern Blue Color
+            fontSize: '1.6rem',
+            fontWeight: '800',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            textDecoration: 'none',
+            letterSpacing: '-0.5px'
+          }}
+        >
+          <div style={{
+            background: '#eff6ff',
+            padding: '8px',
+            borderRadius: '12px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <span style={{ fontSize: '1.5rem' }}>🚌</span>
+          </div>
+          ExpressBook
         </Link>
-        <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        
+        <button 
+          className="navbar-toggler" 
+          type="button" 
+          data-bs-toggle="collapse" 
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+          style={{ border: 'none', boxShadow: 'none' }}
+        >
           <span className="navbar-toggler-icon"></span>
         </button>
+        
         <div className="collapse navbar-collapse" id="navbarNav">
-          <ul className="navbar-nav me-auto">
+          <ul className="navbar-nav me-auto" style={{ marginLeft: '40px', gap: '5px' }}>
+            {/* Home Link */}
             <li className="nav-item">
-              <Link className="nav-link" to="/home" onClick={handleHomeClick}>Home</Link>
+                <Link 
+                  className="nav-link" 
+                  to="/home"
+                  onClick={handleHomeClick}
+                  style={{
+                    color: '#475569', // Slate Gray text
+                    fontWeight: '600',
+                    fontSize: '15px',
+                    padding: '10px 18px',
+                    borderRadius: '8px',
+                    transition: 'all 0.2s ease',
+                    textDecoration: 'none'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.color = '#2563eb';
+                    e.target.style.backgroundColor = '#eff6ff';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.color = '#475569';
+                    e.target.style.backgroundColor = 'transparent';
+                  }}
+                >
+                  Home
+                </Link>
             </li>
-            {/* <li className="nav-item">
-              <Link className="nav-link" to="/schedules">View Bus Schedules</Link>
-            </li> */}
+
+            {/* View Routes Link */}
             <li className="nav-item">
-              <Link className="nav-link" to="/routes">View Routes</Link>
+                <Link 
+                  className="nav-link" 
+                  to="/routes"
+                  style={{
+                    color: '#475569',
+                    fontWeight: '600',
+                    fontSize: '15px',
+                    padding: '10px 18px',
+                    borderRadius: '8px',
+                    transition: 'all 0.2s ease',
+                    textDecoration: 'none'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.color = '#2563eb';
+                    e.target.style.backgroundColor = '#eff6ff';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.color = '#475569';
+                    e.target.style.backgroundColor = 'transparent';
+                  }}
+                >
+                  View Routes
+                </Link>
             </li>
+
+            {/* View Timetable Link */}
             <li className="nav-item">
-              <Link className="nav-link" to="/timetable">View Timetable</Link>
+                <Link 
+                  className="nav-link" 
+                  to="/timetable"
+                  style={{
+                    color: '#475569',
+                    fontWeight: '600',
+                    fontSize: '15px',
+                    padding: '10px 18px',
+                    borderRadius: '8px',
+                    transition: 'all 0.2s ease',
+                    textDecoration: 'none'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.color = '#2563eb';
+                    e.target.style.backgroundColor = '#eff6ff';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.color = '#475569';
+                    e.target.style.backgroundColor = 'transparent';
+                  }}
+                >
+                  View Timetable
+                </Link>
             </li>
           </ul>
 
           {/* Auth Actions */}
-          <ul className="navbar-nav">
+          <ul className="navbar-nav" style={{ alignItems: 'center', gap: '15px' }}>
             {!user ? (
               <>
                 <li className="nav-item">
                   <button 
-                    className="btn btn-outline-primary me-2" 
                     onClick={() => setShowLoginModal(true)}
+                    style={{
+                      color: '#475569',
+                      fontWeight: '600',
+                      background: 'transparent',
+                      border: 'none',
+                      padding: '10px 20px',
+                      cursor: 'pointer',
+                      transition: 'color 0.2s'
+                    }}
+                    onMouseEnter={(e) => e.target.style.color = '#2563eb'}
+                    onMouseLeave={(e) => e.target.style.color = '#475569'}
                   >
-                    Login
+                    Log In
                   </button>
                 </li>
                 <li className="nav-item">
                   <button 
-                    className="btn btn-primary" 
                     onClick={() => setShowSignupModal(true)}
+                    style={{
+                      background: '#2563eb', // Bright Blue
+                      color: 'white',
+                      border: 'none',
+                      padding: '10px 24px',
+                      borderRadius: '50px', // Rounded pill shape
+                      fontWeight: '600',
+                      boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)',
+                      transition: 'transform 0.2s',
+                      cursor: 'pointer'
+                    }}
+                    onMouseEnter={(e) => e.target.style.transform = 'translateY(-2px)'}
+                    onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
                   >
                     Register
                   </button>
                 </li>
               </>
             ) : (
-              <>
-                <li className="nav-item">
-                  <span className="nav-link" style={{ color: '#333' }}>
-                    Welcome, <strong>{user.full_name}</strong> ({user.role})
-                  </span>
-                </li>
-                <li className="nav-item">
-                  <button 
-                    className="btn btn-outline-danger btn-sm" 
-                    onClick={handleLogout}
-                    style={{ marginLeft: '10px' }}
+              <li className="nav-item dropdown" style={{ position: 'relative' }}>
+                 <button
+                    className="btn"
+                    type="button"
+                    onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+                    style={{
+                      background: '#f1f5f9',
+                      color: '#334155',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '50px',
+                      padding: '6px 16px 6px 6px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '10px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s'
+                    }}
+                    onMouseEnter={(e) => {
+                        e.currentTarget.style.background = '#e2e8f0';
+                    }}
+                    onMouseLeave={(e) => {
+                        e.currentTarget.style.background = '#f1f5f9';
+                    }}
                   >
-                    Logout
+                    <div style={{
+                      width: '32px', height: '32px', borderRadius: '50%', background: '#2563eb', color: 'white',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', fontWeight: '700'
+                    }}>
+                      {user.full_name?.charAt(0).toUpperCase()}
+                    </div>
+                    <span>{user.full_name?.split(' ')[0]}</span>
+                    <svg 
+                      style={{ 
+                        width: '16px', 
+                        height: '16px', 
+                        transition: 'transform 0.2s',
+                        transform: showProfileDropdown ? 'rotate(180deg)' : 'rotate(0deg)'
+                      }} 
+                      fill="currentColor" 
+                      viewBox="0 0 20 20"
+                    >
+                      <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
                   </button>
-                </li>
-              </>
+                  
+                  {showProfileDropdown && (
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '100%',
+                        right: '0',
+                        marginTop: '8px',
+                        borderRadius: '12px',
+                        border: 'none',
+                        backgroundColor: 'white',
+                        boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+                        padding: '10px',
+                        minWidth: '220px',
+                        zIndex: 1000
+                      }}
+                    >
+                      <div style={{ padding: '12px 16px', borderBottom: '1px solid #eee', marginBottom: '8px' }}>
+                        <div style={{ fontSize: '14px', color: '#666', marginBottom: '4px' }}>Signed in as</div>
+                        <div style={{ fontWeight: '600', color: '#333' }}>{user.full_name}</div>
+                        <div style={{ 
+                          fontSize: '12px', 
+                          color: 'white', 
+                          background: '#2563eb',
+                          padding: '2px 8px',
+                          borderRadius: '4px',
+                          display: 'inline-block',
+                          marginTop: '6px'
+                        }}>
+                          {user.role}
+                        </div>
+                      </div>
+                      
+                      <button
+                        onClick={() => {
+                          setShowProfileDropdown(false);
+                          navigate('/profile');
+                        }}
+                        style={{ 
+                          width: '100%',
+                          padding: '10px 16px', 
+                          borderRadius: '8px', 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          gap: '10px', 
+                          fontWeight: '500',
+                          color: '#334155',
+                          border: 'none',
+                          background: 'transparent',
+                          cursor: 'pointer',
+                          textAlign: 'left',
+                          transition: 'background 0.2s'
+                        }}
+                        onMouseEnter={(e) => e.target.style.background = '#f8f9fa'}
+                        onMouseLeave={(e) => e.target.style.background = 'transparent'}
+                      >
+                        <span style={{ fontSize: '18px' }}>👤</span> View Profile
+                      </button>
+                      
+                      <button
+                        onClick={() => {
+                          setShowProfileDropdown(false);
+                          handleLogout();
+                        }}
+                        style={{ 
+                          width: '100%',
+                          padding: '10px 16px', 
+                          borderRadius: '8px', 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          gap: '10px', 
+                          color: '#dc3545', 
+                          fontWeight: '500',
+                          border: 'none',
+                          background: 'transparent',
+                          cursor: 'pointer',
+                          textAlign: 'left',
+                          transition: 'background 0.2s'
+                        }}
+                        onMouseEnter={(e) => e.target.style.background = '#fff5f5'}
+                        onMouseLeave={(e) => e.target.style.background = 'transparent'}
+                      >
+                        <span style={{ fontSize: '18px' }}>🚪</span> Logout
+                      </button>
+                    </div>
+                  )}
+              </li>
             )}
           </ul>
         </div>
