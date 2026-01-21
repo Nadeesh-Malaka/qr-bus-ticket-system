@@ -1,5 +1,6 @@
 import { Routes, Route, Link, useNavigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
+import { useState } from 'react';
 import ProtectedRoute from "./components/ProtectedRoute";
 import Home from "./pages/Home";
 import Users from "./components/Users";
@@ -28,7 +29,13 @@ import FeedbackForm from './components/FeedbackForm';
 import CustomerFeedback from './components/CustomerFeedback';
 import LoginModal from './components/LoginModal';
 import SignupModal from './components/SignupModal';
-import { useState } from 'react';
+// New booking flow pages
+import AvailableBuses from './pages/AvailableBuses';
+import BookingPage from './pages/BookingPage';
+import SeatSelection from './pages/SeatSelection';
+import PaymentPage from './pages/PaymentPage';
+import TicketPage from './pages/TicketPage';
+
 
 function NavBar() {
   const { user, logout } = useAuth();
@@ -162,10 +169,19 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/home" element={<Home />} />
           <Route path="/signup" element={<Users />} />
-          <Route path="/schedules" element={<ViewBusSchedules />} />
+          
+          {/* New Booking Flow Routes */}
+          <Route path="/schedules" element={<AvailableBuses />} />
+          <Route path="/booking" element={<BookingPage />} />
+          <Route path="/select-seats" element={<SeatSelection />} />
+          <Route path="/payment" element={<PaymentPage />} />
+          <Route path="/ticket" element={<TicketPage />} />
+          
+          {/* Other public routes */}
           <Route path="/routes" element={<ViewRoutes />} />
           <Route path="/timetable" element={<ViewTimetable />} />
           <Route path="/busSchedule" element={<BusSchedule />} />
+          <Route path="/view-schedules" element={<ViewBusSchedules />} />
 
           {/* Passenger Routes */}
           <Route path="/passenger/dashboard" element={

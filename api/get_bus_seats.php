@@ -8,43 +8,76 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-$conn = new mysqli("localhost", "root", "", "qr_system");
+include 'db.php';
 
-$bus_no = $_GET['bus_no'] ?? '';
-
-if ($bus_no === '') {
-    echo json_encode(["total_seats" => 0, "booked_seats" => []]);
-    exit;
+try {
+    $busId = isset($_GET['bus_id']) ? intval($_GET['bus_id']) : 0;
+    
+    if ($busId === 0) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Bus ID is required'
+        ]);
+        exit;
+    }
+    
+    // Get bus details including seat configuration
+    $busQuery = "SELECT bus_no, no_of_seats, seat_rows, seat_columns, aisle_after_column FROM bus WHERE bus_id = ?";
+    $stmt = $conn->prepare($busQuery);
+    $stmt->bind_param("i", $busId);
+    $stmt->execute();
+    $busResult = $stmt->get_result();
+    
+    if ($busResult->num_rows === 0) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Bus not found'
+        ]);
+        exit;
+    }
+    
+    $bus = $busResult->fetch_assoc();
+    $stmt->close();
+    
+    // Generate seat layout using bus configuration
+    $totalSeats = (int)$bus['no_of_seats'];
+    $configRows = (int)$bus['seat_rows'];
+    $configCols = (int)$bus['seat_columns'];
+    
+    // Use configured values or fallback to defaults
+    $seatsPerRow = ($configCols > 0) ? $configCols : 4;
+    $totalRows = ($configRows > 0) ? $configRows : ceil($totalSeats / $seatsPerRow);
+    
+    $seats = [];
+    $seatCounter = 1;
+    
+    for ($row = 1; $row <= $totalRows && $seatCounter <= $totalSeats; $row++) {
+        for ($col = 1; $col <= $seatsPerRow && $seatCounter <= $totalSeats; $col++) {
+            $seats[] = [
+                'seat_id' => $seatCounter,
+                'bus_id' => $busId,
+                'seat_no' => $seatCounter,
+                'row_no' => $row,
+                'col_no' => $col,
+                'is_large_seat' => 0
+            ];
+            $seatCounter++;
+        }
+    }
+    
+    echo json_encode([
+        'success' => true,
+        'data' => $seats,
+        'bus_no' => $bus['bus_no'],
+        'total_seats' => count($seats)
+    ]);
+    
+} catch (Exception $e) {
+    echo json_encode([
+        'success' => false,
+        'message' => 'Error: ' . $e->getMessage()
+    ]);
 }
 
-/* total seats */
-$stmt = $conn->prepare("SELECT no_of_seats FROM bus WHERE bus_no=?");
-$stmt->bind_param("s", $bus_no);
-$stmt->execute();
-$res = $stmt->get_result();
-
-$total_seats = 0;
-if ($res->num_rows > 0) {
-    $total_seats = (int)$res->fetch_assoc()['no_of_seats'];
-}
-
-/* booked seats */
-$stmt2 = $conn->prepare(
-    "SELECT seat_no FROM seat_booking WHERE bus_no=? AND status='Booked'"
-);
-$stmt2->bind_param("s", $bus_no);
-$stmt2->execute();
-$res2 = $stmt2->get_result();
-
-$booked = [];
-while ($r = $res2->fetch_assoc()) {
-    $booked[] = $r['seat_no'];
-}
-
-echo json_encode([
-    "total_seats" => $total_seats,
-    "booked_seats" => $booked
-]);
-
-
+$conn->close();
 ?>
