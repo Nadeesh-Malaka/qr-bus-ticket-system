@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
+import Footer from '../components/Footer';
 
 export default function AvailableBuses() {
   const [searchParams] = useSearchParams();
@@ -396,6 +397,7 @@ export default function AvailableBuses() {
           )
         )}
       </div>
+      <Footer />
     </>
   );
 }

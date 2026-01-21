@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FiTruck, FiClock, FiMapPin, FiAlertCircle, FiPhone, FiGrid, FiSearch } from 'react-icons/fi';
+import Footer from '../components/Footer';
 
 export default function ViewTimetable() {
   const [buses, setBuses] = useState([]);
@@ -221,44 +222,7 @@ export default function ViewTimetable() {
         )}
       </div>
 
-      {/* Footer */}
-      <footer style={styles.footer}>
-        <div style={styles.footerContainer}>
-          <div style={styles.footerGrid}>
-            <div style={styles.footerColumn}>
-              <h3 style={styles.footerHeading}>Quick Links</h3>
-              <ul style={styles.footerList}>
-                <li style={styles.footerItem}><a href="#" style={styles.footerLink}>About Us</a></li>
-                <li style={styles.footerItem}><a href="#" style={styles.footerLink}>Testimonials</a></li>
-                <li style={styles.footerItem}><a href="#" style={styles.footerLink}>Terms of Service</a></li>
-                <li style={styles.footerItem}><a href="#" style={styles.footerLink}>Privacy</a></li>
-                <li style={styles.footerItem}><a href="#" style={styles.footerLink}>Contact Us</a></li>
-              </ul>
-            </div>
-            <div style={styles.footerColumn}>
-              <h3 style={styles.footerHeading}>Services</h3>
-              <ul style={styles.footerList}>
-                <li style={styles.footerItem}><a href="/schedules" style={styles.footerLink}>View Schedules</a></li>
-                <li style={styles.footerItem}><a href="/routes" style={styles.footerLink}>View Routes</a></li>
-                <li style={styles.footerItem}><a href="/timetable" style={styles.footerLink}>View Timetable</a></li>
-                <li style={styles.footerItem}><a href="#" style={styles.footerLink}>Book Tickets</a></li>
-              </ul>
-            </div>
-            <div style={styles.footerColumn}>
-              <h3 style={styles.footerHeading}>Contact</h3>
-              <ul style={styles.footerList}>
-                <li style={styles.footerItem}><span style={styles.footerText}>Phone: +94 118 1234 23</span></li>
-                <li style={styles.footerItem}><span style={styles.footerText}>Email: expressbook@gmail.com</span></li>
-              </ul>
-            </div>
-          </div>
-          <div style={styles.footerBottom}>
-            <p style={styles.footerCopyright}>
-              Copyright &copy; {new Date().getFullYear()} ExpressBook. All rights reserved
-            </p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

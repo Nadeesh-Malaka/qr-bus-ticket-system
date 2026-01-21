@@ -1,6 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
+import Footer from '../components/Footer';
 
 export default function PaymentPage() {
   const { user } = useContext(AuthContext);
@@ -364,6 +365,7 @@ export default function PaymentPage() {
           </div>
         </div>
       </div>
+      <Footer />
     </>
   );
 }

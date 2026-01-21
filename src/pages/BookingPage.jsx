@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext } from "react";
 import { useSearchParams, useLocation, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import LoginModal from "../components/LoginModal";
+import Footer from '../components/Footer';
 
 export default function BookingPage() {
   const { user } = useContext(AuthContext);
@@ -231,6 +232,7 @@ export default function BookingPage() {
           </div>
         </div>
       </div>
+      <Footer />
     </>
   );
 }

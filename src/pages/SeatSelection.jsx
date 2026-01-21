@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import { useSearchParams, useLocation, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
+import Footer from '../components/Footer';
 
 export default function SeatSelection() {
   const { user } = useContext(AuthContext);
@@ -355,6 +356,7 @@ export default function SeatSelection() {
            width: 60px !important;
         }
       `}</style>
+      <Footer />
     </>
   );
 }

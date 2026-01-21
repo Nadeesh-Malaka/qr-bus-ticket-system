@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "../assets/styles.css";
+import Footer from './Footer';
 
 export default function FeedbackForm() {
 
@@ -121,6 +122,7 @@ export default function FeedbackForm() {
 
         </form>
       </div>
+      <Footer />
     </div>
   );
 }

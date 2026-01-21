@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
+import Footer from './Footer';
 
 export default function BookingHistory() {
   const { user } = useContext(AuthContext);
@@ -137,9 +138,10 @@ export default function BookingHistory() {
   }
 
   return (
-    <div className="container mt-4">
-      {/* Header */}
-      <div className="row mb-4">
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <div className="container mt-4" style={{ flex: 1 }}>
+        {/* Header */}
+        <div className="row mb-4">
         <div className="col-12">
           <div className="d-flex justify-content-between align-items-center">
             <h2 style={{ fontWeight: '700', color: '#2c3e50' }}>
@@ -341,6 +343,8 @@ export default function BookingHistory() {
           ))}
         </div>
       )}
+      </div>
+      <Footer />
     </div>
   );
 }
