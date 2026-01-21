@@ -148,9 +148,21 @@ export default function LoginModal({ show, onClose }) {
                 className="form-link"
                 onClick={(e) => {
                   e.preventDefault();
-                  onClose();
+                  
+                  // Store current URL for redirect after signup
+                  const currentUrl = window.location.pathname + window.location.search;
+                  if (currentUrl.includes('booking')) {
+                    sessionStorage.setItem('redirectAfterSignup', currentUrl);
+                  }
+                  
+                  if (typeof onClose === 'function') {
+                    onClose();
+                  }
                   if (window.openSignupModal) {
                     window.openSignupModal();
+                  } else {
+                    // Fallback: navigate to register page
+                    window.location.href = '/register';
                   }
                 }}
               >

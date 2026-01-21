@@ -59,20 +59,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 /* 🔵 GET USERS (GET) */
-$sql = "SELECT * FROM users";
-$result = $conn->query($sql);
-
-if (!$result) {
-    echo json_encode([]);
-    exit;
+// Check if filtering by specific user_id
+if (isset($_GET['user_id']) && !empty($_GET['user_id'])) {
+    $user_id = $_GET['user_id'];
+    $stmt = $conn->prepare("SELECT * FROM users WHERE user_id = ?");
+    $stmt->bind_param("s", $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    $data = [];
+    while ($row = $result->fetch_assoc()) {
+        $data[] = $row;
+    }
+    
+    echo json_encode($data);
+    $stmt->close();
+} else {
+    // Return all users if no filter
+    $sql = "SELECT * FROM users";
+    $result = $conn->query($sql);
+    
+    if (!$result) {
+        echo json_encode([]);
+        exit;
+    }
+    
+    $data = [];
+    while ($row = $result->fetch_assoc()) {
+        $data[] = $row;
+    }
+    
+    echo json_encode($data);
 }
 
-$data = [];
-while ($row = $result->fetch_assoc()) {
-    $data[] = $row;
-}
-
-echo json_encode($data);
 $conn->close();
 
 ?>

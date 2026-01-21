@@ -52,6 +52,13 @@ $user_id = $user['user_id'];
 if (empty($user_id)) {
     $prefix = $prefixMap[$user['user_type']] ?? "USR";
     $user_id = $prefix . str_pad($user['id'], 6, "0", STR_PAD_LEFT);
+} else {
+    // Normalize existing user_id to ensure proper format (prefix + 6 digits)
+    if (preg_match('/^([A-Z]+)(\d+)$/', $user_id, $matches)) {
+        $prefix = $matches[1];
+        $number = $matches[2];
+        $user_id = $prefix . str_pad($number, 6, "0", STR_PAD_LEFT);
+    }
 }
 
 echo json_encode([

@@ -15,6 +15,7 @@ export default function BookingPage() {
   const [travelDate, setTravelDate] = useState(searchParams.get('date') || location.state?.travelDate || '');
   const [passengerCount, setPassengerCount] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [userData, setUserData] = useState(null);
   
   const busId = searchParams.get('busId');
   const busNo = searchParams.get('busNo');
@@ -26,11 +27,28 @@ export default function BookingPage() {
       return;
     }
 
+    // Fetch full user data including email and mobile
+    if (user && user.user_id) {
+      fetchUserData();
+    }
+
     // If bus data not in state, fetch it
     if (!bus && busId) {
       fetchBusDetails();
     }
   }, [user, bus, busId]);
+
+  const fetchUserData = async () => {
+    try {
+      const response = await fetch(`http://localhost/qrsys/api/get_users.php?user_id=${user.user_id}`);
+      const data = await response.json();
+      if (data && data.length > 0) {
+        setUserData(data[0]);
+      }
+    } catch (err) {
+      console.error("Error fetching user data:", err);
+    }
+  };
 
   const fetchBusDetails = async () => {
     try {
@@ -224,9 +242,9 @@ export default function BookingPage() {
             <div className="card shadow-sm mt-4">
               <div className="card-body">
                 <h6 className="mb-3">Booking for:</h6>
-                <p className="mb-1"><strong>Name:</strong> {user.full_name}</p>
-                <p className="mb-1"><strong>Email:</strong> {user.gmail}</p>
-                <p className="mb-0"><strong>Mobile:</strong> {user.mobile_no}</p>
+                <p className="mb-1"><strong>Name:</strong> {userData?.full_name || user?.full_name || 'N/A'}</p>
+                <p className="mb-1"><strong>Email:</strong> {userData?.gmail || user?.email || 'N/A'}</p>
+                <p className="mb-0"><strong>Mobile:</strong> {userData?.mobile_no || 'N/A'}</p>
               </div>
             </div>
           </div>

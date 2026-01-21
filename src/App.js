@@ -4,6 +4,7 @@ import { useState } from 'react';
 import ProtectedRoute from "./components/ProtectedRoute";
 import Home from "./pages/Home";
 import Users from "./components/Users";
+import ProfilePage from "./pages/ProfilePage";
 import BusSchedule from "./components/BusSchedule";
 import ViewBusSchedules from "./pages/ViewBusSchedules";
 import ViewRoutes from "./pages/ViewRoutes";
@@ -206,7 +207,7 @@ function App() {
           } />
           <Route path="/profile" element={
             <ProtectedRoute allowedRoles={['passenger']}>
-              <Users />
+              <ProfilePage />
             </ProtectedRoute>
           } />
           <Route path="/feedback" element={
