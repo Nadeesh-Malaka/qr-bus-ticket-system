@@ -23,6 +23,12 @@ import ManageRoutes from './components/ManageRoutes';
 import ManageBuses from './components/ManageBuses';
 import PassengerDashboard from './pages/PassengerDashboard';
 import BusOperatorDashboard from './pages/BusOperatorDashboard';
+import BusOperatorDashboardLayout from './pages/BusOperatorDashboardLayout';
+import BusOperatorDashboardMain from './pages/BusOperatorDashboardMain';
+import OperatorMyBuses from './components/OperatorMyBuses';
+import OperatorBookings from './components/OperatorBookings';
+import OperatorTrackBuses from './components/OperatorTrackBuses';
+import OperatorReports from './components/OperatorReports';
 import BusDriverDashboard from './pages/BusDriverDashboard';
 import QRScanner from './components/QRScanner';
 import ManageUsers from './components/ManageUsers';
@@ -82,10 +88,12 @@ function NavBar() {
         navigate('/passenger/dashboard');
       } else if (user.role === 'admin') {
         navigate('/admin');
-      } else if (user.role === 'bus operator') {
+      } else if (user.role === 'bus operator' || user.role === 'bus_operator') {
         navigate('/operator/dashboard');
-      } else if (user.role === 'bus driver') {
+      } else if (user.role === 'bus driver' || user.role === 'bus_driver') {
         navigate('/driver/dashboard');
+      } else {
+        navigate('/home');
       }
     } else {
       navigate('/home');
@@ -515,32 +523,19 @@ function App() {
             </ProtectedRoute>
           } />
 
-          {/* Bus Operator Routes */}
-          <Route path="/operator/dashboard" element={
-            <ProtectedRoute allowedRoles={['bus operator']}>
-              <BusOperatorDashboard />
+          {/* Bus Operator Routes with New Layout */}
+          <Route path="/operator" element={
+            <ProtectedRoute allowedRoles={['bus operator', 'bus_operator']}>
+              <BusOperatorDashboardLayout />
             </ProtectedRoute>
-          } />
-          <Route path="/operator/buses" element={
-            <ProtectedRoute allowedRoles={['bus operator']}>
-              <BusTable />
-            </ProtectedRoute>
-          } />
-          <Route path="/operator/routes" element={
-            <ProtectedRoute allowedRoles={['bus operator']}>
-              <RouteTable />
-            </ProtectedRoute>
-          } />
-          <Route path="/operator/schedules" element={
-            <ProtectedRoute allowedRoles={['bus operator']}>
-              <AddSchedule />
-            </ProtectedRoute>
-          } />
-          <Route path="/operator/bookings" element={
-            <ProtectedRoute allowedRoles={['bus operator']}>
-              <BookingHistory />
-            </ProtectedRoute>
-          } />
+          }>
+            <Route index element={<BusOperatorDashboardMain />} />
+            <Route path="dashboard" element={<BusOperatorDashboardMain />} />
+            <Route path="buses" element={<OperatorMyBuses />} />
+            <Route path="bookings" element={<OperatorBookings />} />
+            <Route path="track" element={<OperatorTrackBuses />} />
+            <Route path="reports" element={<OperatorReports />} />
+          </Route>
 
           {/* Bus Driver Routes */}
           <Route path="/driver/dashboard" element={

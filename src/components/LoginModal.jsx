@@ -44,10 +44,12 @@ export default function LoginModal({ show, onClose }) {
           navigate("/passenger/dashboard");
         } else if (data.role === "admin") {
           navigate("/admin");
-        } else if (data.role === "bus operator") {
+        } else if (data.role === "bus operator" || data.role === "bus_operator") {
           navigate("/operator/dashboard");
-        } else if (data.role === "bus driver") {
+        } else if (data.role === "bus driver" || data.role === "bus_driver") {
           navigate("/driver/dashboard");
+        } else {
+          navigate("/home");
         }
       } else {
         setError(data.message || "Login failed");
