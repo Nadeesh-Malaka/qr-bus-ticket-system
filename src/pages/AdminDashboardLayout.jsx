@@ -3,7 +3,7 @@ import { useNavigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { 
   FiTruck, FiUsers, FiBarChart2, FiMessageSquare,
-  FiLogOut, FiHome, FiMap
+  FiLogOut, FiHome, FiMap, FiActivity
 } from 'react-icons/fi';
 import './AdminDashboard.css';
 
@@ -22,6 +22,7 @@ export default function AdminDashboardLayout() {
     { path: '/admin/routes', label: 'Manage Routes', icon: <FiMap /> },
     { path: '/admin/buses', label: 'Manage Buses', icon: <FiTruck /> },
     { path: '/admin/users', label: 'Manage Users', icon: <FiUsers /> },
+    { path: '/admin/activity-log', label: 'User Activity', icon: <FiActivity /> },
     { path: '/admin/reports', label: 'Reports', icon: <FiBarChart2 /> },
     { path: '/admin/feedback', label: 'Feedback', icon: <FiMessageSquare /> },
   ];

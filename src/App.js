@@ -26,6 +26,7 @@ import BusOperatorDashboard from './pages/BusOperatorDashboard';
 import BusDriverDashboard from './pages/BusDriverDashboard';
 import QRScanner from './components/QRScanner';
 import ManageUsers from './components/ManageUsers';
+import UserActivityLog from './components/UserActivityLog';
 import FeedbackForm from './components/FeedbackForm';
 import CustomerFeedback from './components/CustomerFeedback';
 import LoginModal from './components/LoginModal';
@@ -488,6 +489,7 @@ function App() {
             <Route path="routes" element={<ManageRoutes />} />
             <Route path="buses" element={<ManageBuses />} />
             <Route path="users" element={<ManageUsers />} />
+            <Route path="activity-log" element={<UserActivityLog />} />
             <Route path="reports" element={<CustomerFeedback />} />
             <Route path="feedback" element={<CustomerFeedback />} />
           </Route>
