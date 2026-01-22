@@ -91,3 +91,17 @@
 
 
 
+
+
+
+{"action":"create","route_name":"120 Colombo - horana","start_city":"Maharagama","end_city":"horana","province":"Western","postal_code":"102262","price":"250"}
+
+{"action":"update","route_name":"120 Maharagama- horana","start_city":"Maharagama","end_city":"horana","province":"Western","postal_code":"102262","price":"250.00","route_id":"91"}
+
+
+
+
+
+
+
+

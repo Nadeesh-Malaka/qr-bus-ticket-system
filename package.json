@@ -11,6 +11,7 @@
     "axios": "^1.13.2",
     "bootstrap": "^5.3.8",
     "html5-qrcode": "^2.3.8",
+    "jsqr": "^1.4.0",
     "leaflet": "^1.9.4",
     "qrcode.react": "^4.2.0",
     "react": "^19.2.3",
@@ -23,6 +24,8 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
+    "watch:php": "browser-sync start --proxy \"localhost/qrsys\" --files \"api/**/*.php, public/**/*, src/**/*.{css,js,jsx}\" --no-ui --no-online",
+    "dev:all": "concurrently \"npm run dev\" \"npm run watch:php\"",
     "dev": "react-scripts start",
     "start": "react-scripts start",
     "build": "react-scripts build",
@@ -32,15 +35,6 @@
   "devDependencies": {
     "browser-sync": "^2.27.14",
     "concurrently": "^8.2.1"
-  },
-  "scripts": {
-    "watch:php": "browser-sync start --proxy \"localhost/qrsys\" --files \"api/**/*.php, public/**/*, src/**/*.{css,js,jsx}\" --no-ui --no-online",
-    "dev:all": "concurrently \"npm run dev\" \"npm run watch:php\"",
-    "dev": "react-scripts start",
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [

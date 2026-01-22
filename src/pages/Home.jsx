@@ -267,20 +267,7 @@ export default function Home() {
       
       {/* About Section */}
       <section id="about">
-          <div className="ftco-blocks-cover-1">
-      <div className="ftco-cover-1 overlay innerpage" style={{
-  backgroundImage: "url('/images/alma-Pew_ognBPc8-unsplash.jpg')",
-}}>
-        <div className="container">
-          <div className="row align-items-center justify-content-center">
-            <div className="col-lg-6 text-center">
-              <h1>About Us</h1>
-              <p>Our goal is to make bus travel faster, simpler, and more convenient</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+         
 
     <div className="site-section">
       <div className="container">

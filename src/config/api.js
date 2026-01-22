@@ -34,4 +34,6 @@ const API_ENDPOINTS = {
   GET_USERS: `${API_BASE_URL}/get_users.php`,
 };
 
+// Export both API_BASE_URL and API_ENDPOINTS
+export { API_BASE_URL };
 export default API_ENDPOINTS;

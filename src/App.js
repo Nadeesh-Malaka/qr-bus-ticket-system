@@ -539,27 +539,27 @@ function App() {
 
           {/* Bus Driver Routes */}
           <Route path="/driver/dashboard" element={
-            <ProtectedRoute allowedRoles={['bus driver']}>
+            <ProtectedRoute allowedRoles={['bus_driver', 'bus driver']}>
               <BusDriverDashboard />
             </ProtectedRoute>
           } />
           <Route path="/driver/routes" element={
-            <ProtectedRoute allowedRoles={['bus driver']}>
+            <ProtectedRoute allowedRoles={['bus_driver', 'bus driver']}>
               <RouteTable />
             </ProtectedRoute>
           } />
           <Route path="/driver/qr-scanner" element={
-            <ProtectedRoute allowedRoles={['bus driver']}>
+            <ProtectedRoute allowedRoles={['bus_driver', 'bus driver']}>
               <QRScanner />
             </ProtectedRoute>
           } />
           <Route path="/driver/tracking" element={
-            <ProtectedRoute allowedRoles={['bus driver']}>
+            <ProtectedRoute allowedRoles={['bus_driver', 'bus driver']}>
               <BusTracker />
             </ProtectedRoute>
           } />
           <Route path="/driver/schedule" element={
-            <ProtectedRoute allowedRoles={['bus driver']}>
+            <ProtectedRoute allowedRoles={['bus_driver', 'bus driver']}>
               <BusSchedule />
             </ProtectedRoute>
           } />
