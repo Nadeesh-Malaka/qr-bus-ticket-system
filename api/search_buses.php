@@ -21,6 +21,7 @@ try {
     // Search for buses that match the route
     // Using start_city and end_city from route table
     // Price is stored in route table, not bus table
+    // Using LOWER() and TRIM() for case-insensitive and whitespace-tolerant comparison
     $sql = "SELECT 
                 b.bus_id,
                 b.bus_no,
@@ -39,7 +40,8 @@ try {
                 r.price as base_fare
             FROM bus b
             JOIN route r ON b.route_id = r.route_id
-            WHERE r.start_city = ? AND r.end_city = ?
+            WHERE LOWER(TRIM(r.start_city)) = LOWER(?) 
+            AND LOWER(TRIM(r.end_city)) = LOWER(?)
             ORDER BY b.start_time";
     
     $stmt = $conn->prepare($sql);

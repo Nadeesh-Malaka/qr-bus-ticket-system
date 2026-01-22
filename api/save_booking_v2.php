@@ -87,16 +87,20 @@ try {
     // Insert booking for each selected seat
     $stmt = $conn->prepare(
         "INSERT INTO seat_booking 
-        (user_id, reference_no, passenger_name, number_of_passengers, bus_no, seat_no, travel_date, booking_status, created_at) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())"
+        (user_id, reference_no, passenger_name, number_of_passengers, bus_no, seat_no, travel_date, legacy_status, booking_status, created_at) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, 'BOOKED', ?, NOW())"
     );
     
     foreach ($selectedSeats as $seatNo) {
         // Check if seat is already booked for this date
+        // Check both booking_status and legacy_status for compatibility
         $checkStmt = $conn->prepare(
             "SELECT seat_booking_id FROM seat_booking 
              WHERE bus_no = ? AND seat_no = ? AND travel_date = ? 
-             AND booking_status IN ('pending', 'confirmed')"
+             AND (
+                 booking_status IN ('pending', 'confirmed')
+                 OR (legacy_status = 'BOOKED' AND (booking_status IS NULL OR booking_status NOT IN ('cancelled')))
+             )"
         );
         $checkStmt->bind_param("sss", $busNo, $seatNo, $travelDate);
         $checkStmt->execute();
