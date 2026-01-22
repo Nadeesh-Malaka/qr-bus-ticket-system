@@ -38,7 +38,7 @@ try {
                 r.province,
                 r.price as base_fare
             FROM bus b
-            JOIN route r ON b.bus_route = r.route_name
+            JOIN route r ON b.route_id = r.route_id
             WHERE r.start_city = ? AND r.end_city = ?
             ORDER BY b.start_time";
     

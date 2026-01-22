@@ -88,7 +88,7 @@ try {
                 t.ticket_id
             FROM seat_booking sb
             JOIN bus b ON sb.bus_no = b.bus_no
-            LEFT JOIN route r ON b.bus_route = r.route_name
+            LEFT JOIN route r ON b.route_id = r.route_id
             LEFT JOIN payment_transaction pt ON sb.seat_booking_id = pt.booking_id
             LEFT JOIN ticket t ON sb.seat_booking_id = t.booking_id
             WHERE sb.user_id = ?
