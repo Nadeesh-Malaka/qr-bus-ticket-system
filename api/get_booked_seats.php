@@ -37,16 +37,22 @@ try {
     $stmt->close();
     
     // Query to get all booked seats for this bus and date
-    // Only count confirmed bookings (not pending or cancelled)
+    // Check both legacy_status and booking_status for compatibility
+    // Consider seats as booked if:
+    // - booking_status is 'confirmed' or 'pending'
+    // - OR legacy_status is 'BOOKED' (and not explicitly cancelled)
     $sql = "SELECT 
                 seat_no,
                 passenger_name,
-                booking_status
+                booking_status,
+                legacy_status
             FROM seat_booking 
             WHERE bus_no = ? 
             AND travel_date = ?
-            AND (booking_status = 'confirmed' OR booking_status = 'pending')
-            AND (legacy_status IS NULL OR legacy_status != 'CANCELLED')";
+            AND (
+                booking_status IN ('confirmed', 'pending')
+                OR (legacy_status = 'BOOKED' AND (booking_status IS NULL OR booking_status NOT IN ('cancelled')))
+            )";
     
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("ss", $busNo, $travelDate);

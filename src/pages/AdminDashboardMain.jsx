@@ -21,30 +21,36 @@ export default function AdminDashboardMain() {
 
   const fetchDashboardStats = async () => {
     try {
-      // Fetch stats from APIs
-      const [usersRes, busesRes] = await Promise.all([
-        fetch('http://localhost/qrsys/api/get_users.php'),
-        fetch('http://localhost/qrsys/api/get_buses.php')
-      ]);
+      // Fetch stats from admin stats API
+      const response = await fetch('http://localhost/qrsys/api/get_admin_stats.php');
+      const result = await response.json();
 
-      const users = await usersRes.json();
-      const buses = await busesRes.json();
-
-      setStats({
-        totalUsers: users.length || 12847,
-        totalBuses: buses.length || 156,
-        bookingsToday: 892,
-        revenue: 1200000
-      });
+      if (result.success) {
+        setStats({
+          totalUsers: result.data.totalUsers,
+          totalBuses: result.data.totalBuses,
+          bookingsToday: result.data.todayBookings,
+          revenue: result.data.todayRevenue
+        });
+      } else {
+        console.error('Error fetching stats:', result.message);
+        // Use fallback values
+        setStats({
+          totalUsers: 0,
+          totalBuses: 0,
+          bookingsToday: 0,
+          revenue: 0
+        });
+      }
       setLoading(false);
     } catch (error) {
       console.error('Error fetching stats:', error);
-      // Use default values
+      // Use fallback values
       setStats({
-        totalUsers: 12847,
-        totalBuses: 156,
-        bookingsToday: 892,
-        revenue: 1200000
+        totalUsers: 0,
+        totalBuses: 0,
+        bookingsToday: 0,
+        revenue: 0
       });
       setLoading(false);
     }
@@ -108,7 +114,13 @@ export default function AdminDashboardMain() {
               <FiTrendingUp size={16} />
               <span>+18%</span>
             </div>
-            <div className="stat-value">Rs. {(stats.revenue / 1000000).toFixed(1)}M</div>
+            <div className="stat-value">
+              Rs. {stats.revenue >= 1000000 
+                ? `${(stats.revenue / 1000000).toFixed(1)}M` 
+                : stats.revenue >= 1000 
+                  ? `${(stats.revenue / 1000).toFixed(1)}K`
+                  : stats.revenue.toLocaleString()}
+            </div>
             <div className="stat-label">Revenue</div>
           </div>
         </div>
