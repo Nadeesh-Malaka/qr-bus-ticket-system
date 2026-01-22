@@ -34,7 +34,7 @@ if (!$email || !$password) {
 }
 
 // Fetch user by email
-$stmt = $conn->prepare("SELECT id, full_name, gmail, password, user_type FROM users WHERE gmail=?");
+$stmt = $conn->prepare("SELECT id, user_id, full_name, gmail, password, user_type FROM users WHERE gmail=?");
 $stmt->bind_param("s", $email);
 $stmt->execute();
 $user = $stmt->get_result()->fetch_assoc();
@@ -74,13 +74,10 @@ if (strpos($user['password'], '$2y$') === 0) {
     $update->execute();
 }
 
-// Generate user_id with prefix
-$prefix = $prefixMap[$user['user_type']] ?? "USR";
-$user_id = $prefix . str_pad($user['id'], 4, "0", STR_PAD_LEFT);
-
+// Use the actual user_id from the database
 echo json_encode([
     "status" => true,
-    "user_id" => $user_id,
+    "user_id" => $user['user_id'],
     "role" => $user['user_type'],
     "full_name" => $user['full_name']
 ]);

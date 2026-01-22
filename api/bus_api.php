@@ -23,7 +23,20 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 /* GET - Fetch all buses */
 if ($method === 'GET') {
-    $result = $conn->query("SELECT * FROM bus ORDER BY bus_no");
+    // Join with route table to get complete route information
+    $sql = "SELECT 
+                b.*,
+                r.route_name,
+                r.start_city,
+                r.end_city,
+                r.province,
+                r.postal_code,
+                r.price
+            FROM bus b
+            LEFT JOIN route r ON b.route_id = r.route_id
+            ORDER BY b.bus_no";
+    
+    $result = $conn->query($sql);
     
     $buses = [];
     while ($row = $result->fetch_assoc()) {
@@ -44,15 +57,33 @@ if ($method === 'POST') {
     }
     
     if ($data['action'] === 'create') {
+        // First, get the route_name from the route table
+        $routeStmt = $conn->prepare("SELECT route_name FROM route WHERE route_id = ?");
+        $routeStmt->bind_param("i", $data['route_id']);
+        $routeStmt->execute();
+        $routeResult = $routeStmt->get_result();
+        $route = $routeResult->fetch_assoc();
+        $routeName = $route ? $route['route_name'] : '';
+        $routeStmt->close();
+        
         $stmt = $conn->prepare(
-            "INSERT INTO bus (bus_no, bus_type, capacity, operator_id) VALUES (?, ?, ?, ?)"
+            "INSERT INTO bus (bus_no, route_id, bus_route, no_of_seats, bus_service_tel, start_time, reach_time, seat_rows, seat_columns, aisle_after_column, driver_id, operator_id) 
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
         );
         
         $stmt->bind_param(
-            "ssis",
+            "sisssssiisss",
             $data['bus_no'],
-            $data['bus_type'],
-            $data['capacity'],
+            $data['route_id'],
+            $routeName,
+            $data['no_of_seats'],
+            $data['bus_service_tel'],
+            $data['start_time'],
+            $data['reach_time'],
+            $data['seat_rows'],
+            $data['seat_columns'],
+            $data['aisle_after_column'],
+            $data['driver_id'],
             $data['operator_id']
         );
         
@@ -69,71 +100,77 @@ if ($method === 'POST') {
             ]);
         }
         $stmt->close();
-    }
-    exit;
-}
-
-/* PUT - Update bus */
-if ($method === 'PUT') {
-    $data = json_decode(file_get_contents("php://input"), true);
-    
-    if (!$data || !isset($data['action']) || $data['action'] !== 'update') {
-        echo json_encode(["status" => false, "message" => "Invalid request"]);
         exit;
     }
     
-    $stmt = $conn->prepare(
-        "UPDATE bus SET bus_no=?, bus_type=?, capacity=?, operator_id=? WHERE bus_id=?"
-    );
-    
-    $stmt->bind_param(
-        "ssisi",
-        $data['bus_no'],
-        $data['bus_type'],
-        $data['capacity'],
-        $data['operator_id'],
-        $data['bus_id']
-    );
-    
-    if ($stmt->execute()) {
-        echo json_encode([
-            "status" => true,
-            "message" => "Bus updated successfully"
-        ]);
-    } else {
-        echo json_encode([
-            "status" => false,
-            "message" => $stmt->error
-        ]);
-    }
-    $stmt->close();
-    exit;
-}
-
-/* DELETE - Delete bus */
-if ($method === 'DELETE') {
-    $data = json_decode(file_get_contents("php://input"), true);
-    
-    if (!$data || !isset($data['action']) || $data['action'] !== 'delete') {
-        echo json_encode(["status" => false, "message" => "Invalid request"]);
+    /* Handle UPDATE */
+    if ($data['action'] === 'update') {
+        // First, get the route_name from the route table
+        $routeStmt = $conn->prepare("SELECT route_name FROM route WHERE route_id = ?");
+        $routeStmt->bind_param("i", $data['route_id']);
+        $routeStmt->execute();
+        $routeResult = $routeStmt->get_result();
+        $route = $routeResult->fetch_assoc();
+        $routeName = $route ? $route['route_name'] : '';
+        $routeStmt->close();
+        
+        $stmt = $conn->prepare(
+            "UPDATE bus SET bus_no=?, route_id=?, bus_route=?, no_of_seats=?, bus_service_tel=?, start_time=?, reach_time=?, seat_rows=?, seat_columns=?, aisle_after_column=?, driver_id=?, operator_id=? WHERE bus_id=?"
+        );
+        
+        $stmt->bind_param(
+            "sissssiisssi",
+            $data['bus_no'],
+            $data['route_id'],
+            $routeName,
+            $data['no_of_seats'],
+            $data['bus_service_tel'],
+            $data['start_time'],
+            $data['reach_time'],
+            $data['seat_rows'],
+            $data['seat_columns'],
+            $data['aisle_after_column'],
+            $data['driver_id'],
+            $data['operator_id'],
+            $data['bus_id']
+        );
+        
+        if ($stmt->execute()) {
+            echo json_encode([
+                "status" => true,
+                "message" => "Bus updated successfully"
+            ]);
+        } else {
+            echo json_encode([
+                "status" => false,
+                "message" => $stmt->error
+            ]);
+        }
+        $stmt->close();
         exit;
     }
     
-    $stmt = $conn->prepare("DELETE FROM bus WHERE bus_id=?");
-    $stmt->bind_param("i", $data['bus_id']);
-    
-    if ($stmt->execute()) {
-        echo json_encode([
-            "status" => true,
-            "message" => "Bus deleted successfully"
-        ]);
-    } else {
-        echo json_encode([
-            "status" => false,
-            "message" => $stmt->error
-        ]);
+    /* Handle DELETE */
+    if ($data['action'] === 'delete') {
+        $stmt = $conn->prepare("DELETE FROM bus WHERE bus_id=?");
+        $stmt->bind_param("i", $data['bus_id']);
+        
+        if ($stmt->execute()) {
+            echo json_encode([
+                "status" => true,
+                "message" => "Bus deleted successfully"
+            ]);
+        } else {
+            echo json_encode([
+                "status" => false,
+                "message" => $stmt->error
+            ]);
+        }
+        $stmt->close();
+        exit;
     }
-    $stmt->close();
+    
+    echo json_encode(["status" => false, "message" => "Invalid action"]);
     exit;
 }
 

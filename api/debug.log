@@ -1,9 +1,107 @@
 
 
-{"action":"update","route_id":"3","route_name":"101-Colombo","city":"Piliyandala","province":"Western","postal_code":"10400"}
 
-{"action":"delete","route_id":"3"}
 
-{"action":"create","route_name":"100-Colombo","city":"Pettah - Panadura / Moratuwa","province":"Western Province","postal_code":"01100"}
+
+
+
+
+
+
+{"action":"update","route_name":"120- Horana - Colombo","start_city":"Horana 1","end_city":"Colombo","province":"Western","postal_code":"10320","route_id":"6"}
+
+
+
+
+{"action":"create","route_name":"h","start_city":"Polgasowita","end_city":"Polgasowita","province":"Uva","postal_code":"10320"}
+
+{"action":"delete","route_id":"7"}
+
+
+
+
+{"action":"update","route_name":"120- Horana - Colombo","start_city":"Horana 1","end_city":"Colombo","province":"Western","postal_code":"10320","price":"600.00","route_id":"6"}
+
+{"action":"create","route_name":"99","start_city":"Colombo","end_city":"Badulla","province":"Uva","postal_code":"10330","price":"1200"}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{"action":"update","route_name":"99","start_city":"Colombo","end_city":"Badulla","province":"Uva","postal_code":"10330","price":"650","route_id":"8"}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{"action":"delete","route_id":"90"}
+
+
+
+
+
+
+
+
+{"action":"update","route_name":"99-badulla","start_city":"Colombo","end_city":"Badulla","province":"Uva","postal_code":"10330","price":"650.00","route_id":"8"}
+
+
+
+
+
+
+{"action":"create","route_name":"120 Colombo - horana","start_city":"Maharagama","end_city":"horana","province":"Western","postal_code":"102262","price":"250"}
+
+{"action":"update","route_name":"120 Maharagama- horana","start_city":"Maharagama","end_city":"horana","province":"Western","postal_code":"102262","price":"250.00","route_id":"91"}
+
+
+
+
+
+
 
 

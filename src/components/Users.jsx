@@ -61,9 +61,20 @@ export default function Users() {
           password: ""
         });
 
-        // Navigate to home after 2 seconds
+        // Check if there's a redirect URL stored (from booking flow)
+        const redirectUrl = sessionStorage.getItem('redirectAfterSignup');
+        
+        // Navigate after 2 seconds
         setTimeout(() => {
-          navigate("/home");
+          if (redirectUrl) {
+            // Clear the stored URL
+            sessionStorage.removeItem('redirectAfterSignup');
+            // Redirect back to booking page
+            navigate(redirectUrl);
+          } else {
+            // Default: go to home
+            navigate("/home");
+          }
         }, 2000);
       } else {
         setErrorMessage(result.message || "Registration Failed");

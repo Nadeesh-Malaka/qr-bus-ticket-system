@@ -43,11 +43,13 @@ export default function LoginModal({ show, onClose }) {
         if (data.role === "passenger") {
           navigate("/passenger/dashboard");
         } else if (data.role === "admin") {
-          navigate("/admin/dashboard");
-        } else if (data.role === "bus operator") {
+          navigate("/admin");
+        } else if (data.role === "bus operator" || data.role === "bus_operator") {
           navigate("/operator/dashboard");
-        } else if (data.role === "bus driver") {
+        } else if (data.role === "bus driver" || data.role === "bus_driver") {
           navigate("/driver/dashboard");
+        } else {
+          navigate("/home");
         }
       } else {
         setError(data.message || "Login failed");
@@ -148,9 +150,21 @@ export default function LoginModal({ show, onClose }) {
                 className="form-link"
                 onClick={(e) => {
                   e.preventDefault();
-                  onClose();
+                  
+                  // Store current URL for redirect after signup
+                  const currentUrl = window.location.pathname + window.location.search;
+                  if (currentUrl.includes('booking')) {
+                    sessionStorage.setItem('redirectAfterSignup', currentUrl);
+                  }
+                  
+                  if (typeof onClose === 'function') {
+                    onClose();
+                  }
                   if (window.openSignupModal) {
                     window.openSignupModal();
+                  } else {
+                    // Fallback: navigate to register page
+                    window.location.href = '/register';
                   }
                 }}
               >

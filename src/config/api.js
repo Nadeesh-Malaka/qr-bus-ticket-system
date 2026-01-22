@@ -1,7 +1,7 @@
 // API Configuration
 // Centralized API base URL for the QR System
 
-const API_BASE_URL = "http://localhost/qrsys/api";
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost/qrsys/api";
 
 const API_ENDPOINTS = {
   // Authentication
@@ -34,4 +34,6 @@ const API_ENDPOINTS = {
   GET_USERS: `${API_BASE_URL}/get_users.php`,
 };
 
+// Export both API_BASE_URL and API_ENDPOINTS
+export { API_BASE_URL };
 export default API_ENDPOINTS;

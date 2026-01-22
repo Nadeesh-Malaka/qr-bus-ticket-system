@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import "../assets/fonts/icomoon/style.css";
 import "../assets/fonts/flaticon/font/flaticon.css";
@@ -8,8 +8,19 @@ import "../assets/css/jquery.fancybox.min.css";
 import "../assets/css/aos.css";
 import "../assets/css/style.css";
 import "../assets/styles.css";
+import Footer from "../components/Footer";
 
 export default function Home() {
+  const navigate = useNavigate();
+  
+  // Search state
+  const [routes, setRoutes] = useState([]);
+  const [cities, setCities] = useState([]);
+  const [fromCity, setFromCity] = useState("");
+  const [toCity, setToCity] = useState("");
+  const [travelDate, setTravelDate] = useState("");
+  
+  // Feedback state
   const [feedbacks, setFeedbacks] = useState([]);
   const [expandedId, setExpandedId] = useState(null);
   const [search, setSearch] = useState("");
@@ -38,6 +49,26 @@ export default function Home() {
       document.body.appendChild(script);
     });
 
+    // Fetch routes for search dropdowns
+    fetch("http://localhost/qrsys/api/get_routes.php")
+      .then(res => res.json())
+      .then(data => {
+        console.log("Routes API Response:", data); // Debug log
+        if (data && Array.isArray(data) && data.length > 0) {
+          setRoutes(data);
+          // Extract unique cities from start_city and end_city
+          const allCities = data.flatMap(route => [route.start_city, route.end_city]);
+          const uniqueCities = [...new Set(allCities)].filter(city => city); // Remove null/undefined
+          console.log("Extracted Cities:", uniqueCities); // Debug log
+          setCities(uniqueCities);
+        } else {
+          console.warn("No routes found in database");
+        }
+      })
+      .catch(err => {
+        console.error("Failed to fetch routes:", err);
+      });
+
     // Fetch feedbacks
     fetch("http://localhost/qrsys/api/feedback_api.php")
       .then(res => res.json())
@@ -47,7 +78,28 @@ export default function Home() {
       .catch(err => {
         console.error("Failed to fetch feedbacks:", err);
       });
+      
+    // Set minimum date to today
+    const today = new Date().toISOString().split('T')[0];
+    setTravelDate(today);
   }, []);
+
+  const handleSearchBuses = (e) => {
+    e.preventDefault();
+    
+    if (!fromCity || !toCity || !travelDate) {
+      alert("Please fill all search fields");
+      return;
+    }
+    
+    if (fromCity === toCity) {
+      alert("From and To cities cannot be the same");
+      return;
+    }
+    
+    // Navigate to schedules page with search parameters
+    navigate(`/schedules?from=${encodeURIComponent(fromCity)}&to=${encodeURIComponent(toCity)}&date=${travelDate}`);
+  };
 
   const toggleExpand = (id) => setExpandedId(expandedId === id ? null : id);
   const renderStars = (count) => "★".repeat(count) + "☆".repeat(5 - count);
@@ -79,19 +131,127 @@ export default function Home() {
       style={{ backgroundImage: "url('/images/main_img.jpg')" }}
     >
       <div className="container">
-        <div className="row align-items-center justify-content-center text-center" style={{ minHeight: '60vh' }}>
-          <div className="col-lg-8">
+        <div className="row align-items-center justify-content-center text-center" style={{ minHeight: '70vh' }}>
+          <div className="col-lg-10">
             <h1 className="mb-4" style={{ fontSize: '3.5rem', fontWeight: 'bold', color: 'white', textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
               Welcome to ExpressBook
             </h1>
-            <p className="mb-5" style={{ fontSize: '1.5rem', color: 'white', textShadow: '1px 1px 3px rgba(0,0,0,0.5)' }}>
+            <p className="mb-5" style={{ fontSize: '1.3rem', color: 'white', textShadow: '1px 1px 3px rgba(0,0,0,0.5)' }}>
               Your trusted online bus booking platform. Fast, simple, and convenient travel at your fingertips.
             </p>
-            <div className="d-flex justify-content-center gap-3">
-              <a href="#about" className="btn btn-primary btn-lg px-5 py-3" style={{ fontSize: '1.2rem' }}>
+            
+            {/* Modern Search Container */}
+            <div className="search-container" style={{
+              background: 'rgba(255, 255, 255, 0.95)',
+              borderRadius: '15px',
+              padding: '40px',
+              boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
+              maxWidth: '900px',
+              margin: '0 auto'
+            }}>
+              <h3 style={{ color: '#333', marginBottom: '25px', fontSize: '1.5rem' }}>Find Your Bus</h3>
+              <form onSubmit={handleSearchBuses}>
+                <div className="row g-3">
+                  {/* From City */}
+                  <div className="col-md-4">
+                    <label style={{ color: '#666', fontSize: '0.9rem', marginBottom: '8px', display: 'block', textAlign: 'left' }}>
+                      <i className="icon-location-pin" style={{ marginRight: '5px' }}></i> From
+                    </label>
+                    <select 
+                      className="form-control" 
+                      value={fromCity}
+                      onChange={(e) => setFromCity(e.target.value)}
+                      style={{ 
+                        height: '50px', 
+                        borderRadius: '8px',
+                        border: '2px solid #e0e0e0',
+                        fontSize: '1rem'
+                      }}
+                      required
+                    >
+                      <option value="">Select Start City</option>
+                      {cities.map((city, idx) => (
+                        <option key={idx} value={city}>{city}</option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  {/* To City */}
+                  <div className="col-md-4">
+                    <label style={{ color: '#666', fontSize: '0.9rem', marginBottom: '8px', display: 'block', textAlign: 'left' }}>
+                      <i className="icon-location-pin" style={{ marginRight: '5px' }}></i> To
+                    </label>
+                    <select 
+                      className="form-control"
+                      value={toCity}
+                      onChange={(e) => setToCity(e.target.value)}
+                      style={{ 
+                        height: '50px', 
+                        borderRadius: '8px',
+                        border: '2px solid #e0e0e0',
+                        fontSize: '1rem'
+                      }}
+                      required
+                    >
+                      <option value="">Select End City</option>
+                      {cities.map((city, idx) => (
+                        <option key={idx} value={city}>{city}</option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  {/* Travel Date */}
+                  <div className="col-md-4">
+                    <label style={{ color: '#666', fontSize: '0.9rem', marginBottom: '8px', display: 'block', textAlign: 'left' }}>
+                      <i className="icon-calendar" style={{ marginRight: '5px' }}></i> Travel Date
+                    </label>
+                    <input 
+                      type="date"
+                      className="form-control"
+                      value={travelDate}
+                      onChange={(e) => setTravelDate(e.target.value)}
+                      min={new Date().toISOString().split('T')[0]}
+                      style={{ 
+                        height: '50px', 
+                        borderRadius: '8px',
+                        border: '2px solid #e0e0e0',
+                        fontSize: '1rem'
+                      }}
+                      required
+                    />
+                  </div>
+                </div>
+                
+                {/* Search Button */}
+                <div className="row mt-4">
+                  <div className="col-12">
+                    <button 
+                      type="submit" 
+                      className="btn btn-primary btn-lg"
+                      style={{
+                        width: '100%',
+                        height: '55px',
+                        borderRadius: '8px',
+                        fontSize: '1.2rem',
+                        fontWeight: '600',
+                        boxShadow: '0 4px 15px rgba(0,123,255,0.3)',
+                        transition: 'all 0.3s'
+                      }}
+                    >
+                      <i className="icon-search" style={{ marginRight: '10px' }}></i>
+                      Find Buses
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+
+            {/* Call to Action Buttons */}
+            <div className="d-flex justify-content-center gap-3 mt-5">
+              <a href="#about" className="btn btn-outline-light btn-lg px-4 py-3" style={{ fontSize: '1rem' }}>
                 Learn More
               </a>
-              <a href="#services" className="btn btn-outline-light btn-lg px-5 py-3" style={{ fontSize: '1.2rem' }}>
+              <a href="#services" className="btn btn-outline-light btn-lg px-4 py-3" style={{ fontSize: '1rem' }}>
                 Our Services
               </a>
             </div>
@@ -107,20 +267,7 @@ export default function Home() {
       
       {/* About Section */}
       <section id="about">
-          <div className="ftco-blocks-cover-1">
-      <div className="ftco-cover-1 overlay innerpage" style={{
-  backgroundImage: "url('/images/alma-Pew_ognBPc8-unsplash.jpg')",
-}}>
-        <div className="container">
-          <div className="row align-items-center justify-content-center">
-            <div className="col-lg-6 text-center">
-              <h1>About Us</h1>
-              <p>Our goal is to make bus travel faster, simpler, and more convenient</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+         
 
     <div className="site-section">
       <div className="container">
@@ -365,38 +512,8 @@ export default function Home() {
     </div>
    </section>
       
-      {/* Footer */}
-      <footer className="site-footer">
-        <div className="container">
-          <div className="row">
-            <div className="col-lg-8 ml-auto">
-              <div className="row">
-                {[...Array(4)].map((_, idx) => (
-                  <div className="col-lg-3" key={idx}>
-                    <h2 className="footer-heading mb-4">Quick Links</h2>
-                    <ul className="list-unstyled">
-                      <li><a href="#">About Us</a></li>
-                      <li><a href="#">Testimonials</a></li>
-                      <li><a href="#">Terms of Service</a></li>
-                      <li><a href="#">Privacy</a></li>
-                      <li><a href="#">Contact Us</a></li>
-                    </ul>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-          <div className="row pt-5 mt-5 text-center">
-            <div className="col-md-12">
-              <div className="border-top pt-5">
-                <p>
-                  Copyright &copy; {new Date().getFullYear()} All rights reserved
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </footer>
+      {/* Footer Section */}
+      <Footer />
 
     </div>
   );

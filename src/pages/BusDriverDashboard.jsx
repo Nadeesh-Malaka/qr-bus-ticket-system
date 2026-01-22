@@ -1,108 +1,170 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import '../assets/dashboard.css';
+import '../assets/driver.css';
+import DriverScanTicket from '../components/DriverScanTicket';
+import DriverSchedule from '../components/DriverSchedule';
+import DriverPassengerList from '../components/DriverPassengerList';
+import DriverProfile from '../components/DriverProfile';
 
 export default function BusDriverDashboard() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const [activeTab, setActiveTab] = useState('home');
+  const [currentTime, setCurrentTime] = useState(new Date());
 
-  const menuItems = [
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const formatTime = (date) => {
+    return date.toLocaleTimeString('en-US', { 
+      hour: '2-digit', 
+      minute: '2-digit',
+      hour12: true 
+    });
+  };
+
+  const formatDate = (date) => {
+    return date.toLocaleDateString('en-US', { 
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+
+  const renderContent = () => {
+    switch(activeTab) {
+      case 'scan':
+        return <DriverScanTicket />;
+      case 'schedule':
+        return <DriverSchedule />;
+      case 'passengers':
+        return <DriverPassengerList />;
+      case 'profile':
+        return <DriverProfile />;
+      default:
+        return <DriverHome setActiveTab={setActiveTab} />;
+    }
+  };
+
+  return (
+    <div className="driver-dashboard-wrapper">
+      <header className="driver-header">
+        <div className="driver-header-content">
+          <div>
+            <h1>🚍 Driver Dashboard</h1>
+            <p className="driver-header-time">{formatDate(currentTime)}</p>
+          </div>
+          <div style={{ textAlign: 'right' }}>
+            <div style={{ fontSize: '20px', fontWeight: '700' }}>{formatTime(currentTime)}</div>
+            <div style={{ fontSize: '12px', color: '#718096' }}>{user?.full_name}</div>
+          </div>
+        </div>
+      </header>
+
+      <div className="driver-content">
+        {renderContent()}
+      </div>
+
+      {/* Bottom Navigation */}
+      <nav className="driver-bottom-nav">
+        <button 
+          className={`driver-nav-item ${activeTab === 'home' ? 'active' : ''}`}
+          onClick={() => setActiveTab('home')}
+        >
+          <span className="driver-nav-icon">🏠</span>
+          <span className="driver-nav-label">Home</span>
+        </button>
+        <button 
+          className={`driver-nav-item ${activeTab === 'scan' ? 'active' : ''}`}
+          onClick={() => setActiveTab('scan')}
+        >
+          <span className="driver-nav-icon">📷</span>
+          <span className="driver-nav-label">Scan</span>
+        </button>
+        <button 
+          className={`driver-nav-item ${activeTab === 'schedule' ? 'active' : ''}`}
+          onClick={() => setActiveTab('schedule')}
+        >
+          <span className="driver-nav-icon">📅</span>
+          <span className="driver-nav-label">Schedule</span>
+        </button>
+        <button 
+          className={`driver-nav-item ${activeTab === 'passengers' ? 'active' : ''}`}
+          onClick={() => setActiveTab('passengers')}
+        >
+          <span className="driver-nav-icon">📋</span>
+          <span className="driver-nav-label">Passengers</span>
+        </button>
+        <button 
+          className={`driver-nav-item ${activeTab === 'profile' ? 'active' : ''}`}
+          onClick={() => setActiveTab('profile')}
+        >
+          <span className="driver-nav-icon">👤</span>
+          <span className="driver-nav-label">Profile</span>
+        </button>
+      </nav>
+
+      {/* Footer */}
+      {activeTab === 'home' && (
+        <div className="driver-footer">
+          <p>QR Bus System - Driver Portal</p>
+          <p>&copy; 2026 All Rights Reserved</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Home Screen Component
+function DriverHome({ setActiveTab }) {
+  const tiles = [
     {
-      title: 'My Routes',
-      description: 'View assigned routes and schedule',
-      icon: '🛣️',
-      link: '/driver/routes',
-      color: '#0dcaf0'
+      icon: '📷',
+      title: 'Scan Ticket',
+      desc: 'Verify passenger QR codes',
+      tab: 'scan',
+      color: '#667eea'
     },
     {
-      title: 'Scan QR Code',
-      description: 'Scan and verify passenger tickets',
-      icon: '📱',
-      link: '/driver/qr-scanner',
-      color: '#198754'
-    },
-    {
-      title: 'Track Location',
-      description: 'Enable real-time location tracking',
-      icon: '📍',
-      link: '/driver/tracking',
-      color: '#dc3545'
-    },
-    {
-      title: 'My Schedule',
-      description: 'View daily driving schedule',
       icon: '📅',
-      link: '/driver/schedule',
-      color: '#ffc107'
+      title: 'My Schedule',
+      desc: 'View today\'s trips',
+      tab: 'schedule',
+      color: '#48bb78'
+    },
+    {
+      icon: '📋',
+      title: 'Passengers',
+      desc: 'Check booking status',
+      tab: 'passengers',
+      color: '#ed8936'
+    },
+    {
+      icon: '👤',
+      title: 'Profile',
+      desc: 'View & edit profile',
+      tab: 'profile',
+      color: '#4299e1'
     }
   ];
 
   return (
-    <div style={{ padding: '30px', backgroundColor: '#f5f5f5', minHeight: '100vh' }}>
-      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-        <div style={{
-          background: 'linear-gradient(135deg, #0dcaf0 0%, #0aa2c0 100%)',
-          padding: '30px',
-          borderRadius: '12px',
-          marginBottom: '30px',
-          color: 'white'
-        }}>
-          <h1 style={{ margin: 0, fontSize: '32px' }}>Bus Driver Dashboard 🚍</h1>
-          <p style={{ margin: '10px 0 0 0', fontSize: '16px', opacity: 0.9 }}>
-            Welcome, {user?.full_name} | User ID: {user?.user_id}
-          </p>
-        </div>
-
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-          gap: '20px'
-        }}>
-          {menuItems.map((item, index) => (
-            <Link
-              key={index}
-              to={item.link}
-              style={{
-                textDecoration: 'none',
-                backgroundColor: 'white',
-                padding: '25px',
-                borderRadius: '12px',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                transition: 'transform 0.2s, box-shadow 0.2s',
-                display: 'flex',
-                alignItems: 'flex-start',
-                gap: '15px'
-              }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.transform = 'translateY(-5px)';
-                e.currentTarget.style.boxShadow = '0 8px 16px rgba(0,0,0,0.15)';
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
-              }}
-            >
-              <div style={{
-                fontSize: '40px',
-                backgroundColor: item.color + '20',
-                padding: '15px',
-                borderRadius: '10px',
-                lineHeight: 1
-              }}>
-                {item.icon}
-              </div>
-              <div style={{ flex: 1 }}>
-                <h3 style={{ margin: '0 0 8px 0', color: '#2c3e50', fontSize: '20px' }}>
-                  {item.title}
-                </h3>
-                <p style={{ margin: 0, color: '#7f8c8d', fontSize: '14px' }}>
-                  {item.description}
-                </p>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </div>
+    <div className="driver-home-tiles">
+      {tiles.map((tile, index) => (
+        <button
+          key={index}
+          className="driver-tile"
+          onClick={() => setActiveTab(tile.tab)}
+          style={{ borderTop: `4px solid ${tile.color}` }}
+        >
+          <span className="driver-tile-icon">{tile.icon}</span>
+          <h3 className="driver-tile-title">{tile.title}</h3>
+          <p className="driver-tile-desc">{tile.desc}</p>
+        </button>
+      ))}
     </div>
   );
 }
