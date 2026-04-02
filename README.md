@@ -8,7 +8,9 @@
 </p>
 
 ---
+<img width="1351" height="765" alt="home" src="https://github.com/user-attachments/assets/cb80c3ca-ffaa-4090-b969-18c9e5d268b0" />
 
+---
 ## 📌 Project Overview
 
 The **QR Based Bus Ticket Reservation System** is a modern, web-based application designed to digitize the traditional bus ticket booking process.
